@@ -9,7 +9,7 @@ export const HeroSection = () => {
     };
 
     return (
-        <div className="flex flex-col md:justify-center items-center bg-[#001529] h-full bg-effect-background bg-cover bg-center">
+        <div className="flex flex-col md:justify-center items-center bg-[#001529] h-[100vh] bg-effect-background bg-cover bg-center">
             <div className="font-bold  mt-[20vh] md:mt-0 md:text-6xl text-xl sm:text-4xl flex flex-col items-center text-white mb-2 md:mb-11 font-montserrat">
                 <div>Empowering Businesses with</div>
                 <div>Real-Time Financial Insights</div>
