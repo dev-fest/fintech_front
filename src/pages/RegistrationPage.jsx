@@ -2,11 +2,12 @@ import React, { useState } from "react";
 import { Input, Checkbox, Button, message } from 'antd'; 
 import { UserOutlined, LockOutlined } from '@ant-design/icons';
 import { useNavigate } from "react-router-dom"; 
+import useAuthStore from "../store/useAuthStore";
 
 const RegistrationPage = () => {
   const navigate = useNavigate(); 
+  const { login, signup } = useAuthStore();
 
-  // State to manage views
   const [isLogin, setIsLogin] = useState(true);
   const [email, setEmail] = useState('');
   const [password, setPassword] = useState('');
@@ -24,7 +25,6 @@ const RegistrationPage = () => {
   };
 
   const handleNext = () => {
-    // Basic validation for email and password
     if (!email || !password) {
       message.error("Email and password are required!");
       return;
@@ -32,25 +32,32 @@ const RegistrationPage = () => {
     setShowNext(true);
   };
 
-  const handleCompleteProfile = () => {
-    // Additional validation
-    if (!firstName || !lastName || !companyName || !field) {
-      message.error("All fields are required!");
-      return;
+  const handleCompleteProfile = async () => {
+    if (!firstName || !lastName ) {
+        message.error("All fields are required!");
+        return;
     }
-    
-    // After successful registration, navigate to the dashboard
-    navigate('/admin'); 
-  };
-
-  // Add the login function with navigation to AdminPage
-  const handleLogin = () => {
+    const roleId = "6713a61ec74280ead1f879b3"; 
+    try {
+        await signup(firstName, lastName, email, password, roleId);
+        message.success("Registration successful!");
+        navigate('/admin');
+    } catch (error) {
+        message.error("Registration failed: " + (error.response?.data?.message || "An error occurred."));
+    }
+};
+  const handleLogin = async () => {
     if (!email || !password) {
       message.error("Email and password are required!");
       return;
     }
-    // You can add login logic here (e.g., API call)
-    navigate('/admin'); // Navigate to AdminPage on successful login
+    try {
+      await login(email, password);
+      message.success("Login successful!");
+      navigate('/admin');
+    } catch (error) {
+      message.error("Login failed: " + (error.response?.data?.message || "An error occurred."));
+    }
   };
 
   return (
@@ -121,18 +128,6 @@ const RegistrationPage = () => {
               className="w-full mb-3"
               value={lastName}
               onChange={(e) => setLastName(e.target.value)}
-            />
-            <Input
-              placeholder="Company Name"
-              className="w-full mb-3"
-              value={companyName}
-              onChange={(e) => setCompanyName(e.target.value)}
-            />
-            <Input
-              placeholder="Field"
-              className="w-full mb-3"
-              value={field}
-              onChange={(e) => setField(e.target.value)}
             />
             <Button type="primary" className="w-full mb-3" onClick={handleCompleteProfile}>
               Sign Up
@@ -218,3 +213,4 @@ const RegistrationPage = () => {
 };
 
 export default RegistrationPage;
+
