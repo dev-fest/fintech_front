@@ -22,16 +22,16 @@ const Faq = () => {
     }
   };
   return (
-    <div className='flex flex-col items-center'>
+    <div className='flex flex-col items-center bg-[#F2F9FA]'>
       {/* SEO Meta Tags */}
       <Helmet>
-        <title>Frequently Asked Questions - CoreCapital</title>
+        <title>CoreCapital</title>
         <meta name="description" content="Find answers to your frequently asked questions about our real-time financial dashboard, reporting features, and more." />
         <meta name="keywords" content="FAQ, financial dashboard, financial reports, access financial data, expense insights, scalability" />
         <meta name="robots" content="index, follow" />
       </Helmet>
 
-      <div className="font-bold text-6xl flex flex-col items-center font-montserrat text-transparent bg-clip-text bg-gradient-to-t to-blue-500 from-indigo-500 mt-5">
+      <div className="font-bold text-6xl flex flex-col items-center font-montserrat text-transparent bg-clip-text bg-gradient-to-t to-blue-500 from-indigo-500 mt-20">
         <p>FAQ</p>
       </div>
       
@@ -107,13 +107,13 @@ const Faq = () => {
         </div>
       </div>
       
-      <div className='bg-[#001529] flex flex-col items-center w-full text-white'>
+      <div className='bg-[#001529] flex flex-col items-center w-full text-white '>
         <div className='font-montserrat font-bold text-3xl text-white mt-16'>Get in Touch</div>
-        <div className='font-poppins flex flex-col justify-center items-center mt-8 font-light'>
+        <div className='font-poppins flex flex-col justify-center items-center mt-8 font-light px-4 '>
           <div>Have any questions or interested in joining our community? Feel free to contact us,</div>
           <div>and we’ll be happy to assist you.</div>
         </div>
-        <div className='flex flex-row pl-4 bg-[#F2F4F8] rounded-2xl mt-8 mb-16'>
+        <div className='flex flex-row pl-4 bg-[#F2F4F8] rounded-2xl mt-8 mb-16 '>
           <img src="../../../public/assests/envelope.svg" alt="envelope" />
           <input 
             type="email" 
