@@ -16,9 +16,14 @@ const Faq = () => {
 
   const handleSubscribe = () => {
     if (email) {
-      // Handle the subscription logic here, e.g., sending the email to an API
-      alert(`Subscribed with email: ${email}`);
-      setEmail(''); // Reset the email input
+      // Create a mailto link
+      const mailtoLink = `mailto:contact@corecapital.dz?subject=Subscription&body=I would like to subscribe with this email: ${email}`;
+      
+      // Open the default email client with the mailto link
+      window.location.href = mailtoLink;
+  
+      // Reset the email input
+      setEmail('');
     }
   };
   return (
