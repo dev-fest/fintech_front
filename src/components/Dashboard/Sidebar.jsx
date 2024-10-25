@@ -7,7 +7,7 @@ import logo from '../../../public/assests/logo.svg';
 
 const Sidebar = ({ activeContent, setActiveContent }) => {
   return (
-    <div className="w-56 h-full bg-[#001529] text-white fixed flex flex-col"
+    <div className="w-56 h-full bg-[#001529] text-white fixed flex flex-col font-poppins"
     style={{ boxShadow: '2.21px 0px 6.64px 0px #00152959' }} // Inline style for box shadow
 >
       <div className='flex justify-center items-center'>

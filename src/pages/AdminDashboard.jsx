@@ -25,7 +25,7 @@ const AdminPage = () => {
   return (
     <div className="flex color">
       <Sidebar activeContent={activeContent} setActiveContent={setActiveContent} />
-      <div className="flex-1 pl-56 h-screen overflow-auto"> {/* Adjust margin for sidebar */}
+      <div className="flex-1 pl-56 min-h-[100vh] overflow-auto"> {/* Adjust margin for sidebar */}
         <NavbarDash />
         <div className='bg-[#F2F9FA] flex-grow h-full'>
         {renderActiveContent()}

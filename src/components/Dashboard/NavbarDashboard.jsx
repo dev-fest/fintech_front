@@ -3,6 +3,7 @@ import Search from "../../../public/assests/search.svg";
 import Notification from "../../../public/assests/notif.svg";
 import Language from "../../../public/assests/language.svg";
 import UserPDF from "../../../public/assests/UserPDF.svg";
+import { Input } from 'antd';
 
 const NavbarDash = () => {
   // Sample notification data
@@ -34,13 +35,33 @@ const NavbarDash = () => {
   ]);
 
   const [showDropdown, setShowDropdown] = useState(false);
-  const [activeFilter, setActiveFilter] = useState("all");
+  const [showProfil, setShowProfil] = useState(false);
+  const [email, setEmail] = useState("li_boussebata@esi.dz");
+  const [fname, setFname] = useState("Issam");
+  const [lname, setLname] = useState("oussebata");
+  const [role, setRole] = useState("Admin");
 
+  const [activeFilter, setActiveFilter] = useState("all");
+  const [selectedImage, setSelectedImage] = useState(null);
+
+  const handleImageChange = (e) => {
+    const file = e.target.files[0];
+    if (file) {
+      const reader = new FileReader();
+      reader.onloadend = () => {
+        setSelectedImage(reader.result);
+      };
+      reader.readAsDataURL(file);
+    }
+  };
   // Toggle dropdown visibility
   const toggleDropdown = () => {
     setShowDropdown((prev) => !prev);
   };
-
+// Toggle dropdown visibility
+const toggleProfil = () => {
+  setShowProfil((prev) => !prev);
+};
   // Mark all notifications as read
   const markAllAsRead = () => {
     setNotifications((prevNotifications) =>
@@ -63,13 +84,13 @@ const NavbarDash = () => {
 
   return (
     <nav
-      className="w-full h-[7vh] bg-white text-black flex flex-row items-center justify-end px-6 gap-5"
+      className="w-full h-[7vh] bg-white text-black flex flex-row items-center justify-end px-6 gap-5 font-poppins"
       style={{ boxShadow: "0px 1.04px 4.16px 0px #0015291F" }}
     >
       <button className="flex items-center">
         <img src={Search} alt="Search icon" />
       </button>
-      <button className="flex items-center" onClick={toggleDropdown}>
+      <button className="flex items-center cursor-pointer" onClick={toggleDropdown}>
         <img src={Notification} alt="Notification icon" />
       </button>
       {showDropdown && (
@@ -128,7 +149,51 @@ const NavbarDash = () => {
           </div>
         </div>
       )}
-      <div className="flex flex-row justify-center items-center gap-1">
+      {showProfil && (
+        <div className="absolute right-6 top-[7vh] w-[40vw] bg-[#F2F9FA] border rounded shadow-lg p-4 z-10">
+          <div className="flex flex-col gap-2 px-3">
+            <div className="flex flex-row justify-between ">
+              <div className="font-semibold">Profil</div>
+              <img src="../../../public/assests/x_icon.svg" alt="" className="h-3 cursor-pointer rounded-sm bg-white border border-black" onClick={toggleProfil}  />
+            </div>
+            <div className="h-[1px] w-full bg-gray-200"></div>
+            {/* Profil picture row */}
+            <div className="flex flex-row items-center gap-5">
+            <div className="relative mb-4">
+        {/* Circular Profile Picture */}
+        <img
+          src={selectedImage || 'path/to/default-image.jpg'} // Placeholder image if no picture is uploaded
+          alt="Profile"
+          className="h-24 w-24 rounded-full border-4 border-blue-500 object-cover"
+        />
+        <input
+          type="file"
+          accept="image/*"
+          onChange={handleImageChange}
+          className="absolute inset-0 opacity-0 cursor-pointer" // Invisible file input over the image
+        />
+      </div>
+      {/* Upload Button */}
+      <label className="bg-blue-500 text-white h-min px-4 py-2 rounded hover:bg-blue-600 cursor-pointer">
+        Upload Profile Picture
+      </label>
+   
+            </div>
+            <div className="text-sm">First name</div>
+            <Input placeholder="first name" value={fname} className="rounded-sm" />
+            <div className="text-sm">Last name</div>
+
+            <Input placeholder="last name" value={lname} className="rounded-sm"/>
+            <div className="text-sm"> Email</div>
+
+            <Input placeholder="email" disabled value={email} className="rounded-sm"/>
+            <div className="text-sm">Role</div>
+
+            <Input placeholder="role" disabled value={role}  className="rounded-sm"/>
+          </div>
+        </div>
+      )}
+      <div className="flex flex-row justify-center items-center gap-1 cursor-pointer" onClick={toggleProfil}>
         <img src={UserPDF} alt="user photo" />
         <div>User</div>
       </div>
