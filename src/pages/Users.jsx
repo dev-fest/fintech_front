@@ -1,11 +1,17 @@
 import React, { useState, useEffect } from "react";
 import { Input, Space, Table, Tag, Button, Modal, Form, Input as AntdInput, Select, Anchor } from "antd";
-import useUserStore from "../store/useUsersStore";
+import useUsersStore from "../store/useUsersStore"; 
 import useAuthStore from "../store/useAuthStore"; 
 
 const { Search } = Input;
 const { Option } = Select;
 const { Link } = Anchor;
+
+const roleIdMapping = {
+  Admin: '671420c2df2d71de25efde15',
+  Moderator: '6713a61ec74280ead1f879b3',
+  User: '6713a626c74280ead1f879b4'
+};
 
 const Users = () => {
   const [isModalVisible, setIsModalVisible] = useState(false);
@@ -14,12 +20,16 @@ const Users = () => {
   const [editingUser, setEditingUser] = useState(null);
   const [filteredData, setFilteredData] = useState([]);
 
-  const { users, fetchUsers } = useUserStore();
+  const { users, fetchUsers, modifyUser, deleteUser } = useUsersStore(); 
   const { signup } = useAuthStore(); 
 
   useEffect(() => {
     fetchUsers();
   }, [fetchUsers]);
+
+  useEffect(() => {
+    setFilteredData(users);
+  }, [users]);
 
   const showModal = (user) => {
     if (user) {
@@ -35,40 +45,52 @@ const Users = () => {
   const handleOk = async () => {
     try {
       const values = await form.validateFields();
-      const { firstName, lastName, email, password, status } = values;
-      const roleIdMapping = {
-        Admin: '671420c2df2d71de25efde15',
-        Moderator: '6713a61ec74280ead1f879b3',
-        User: '6713a626c74280ead1f879b4'
+      const { first_name, last_name, email, password, status } = values;
+      const role_id = roleIdMapping[status];
+  
+      const requestData = {
+        first_name,
+        last_name,
+        email,
+        password,
+        role_id,
       };
-
-      const roleId = roleIdMapping[status]; 
-
-      if (editingUser) {
-        // Logic for editing the user (if required)
+  
+      console.log('Sending Request Data:', requestData); // Log the data you're sending
+  
+      if (editingUser && editingUser._id) {
+        // Log the user ID for editing
+        console.log('Editing User ID:', editingUser._id);
+        await modifyUser(editingUser._id, requestData);
+        setFilteredData((prevUsers) =>
+          prevUsers.map((user) => 
+            user._id === editingUser._id ? { ...user, ...requestData } : user
+          )
+        );
       } else {
-        // Call the signup function with the mapped role ID
-        await signup(firstName, lastName, email, password, roleId);
+        await signup(first_name, last_name, email, password, role_id);
+        fetchUsers();
       }
-
+  
       setIsModalVisible(false);
-    } catch (info) {
-      console.log("Validation Failed:", info);
+    } catch (error) {
+      console.error("Validation Failed:", error.response?.data || error.message);
     }
   };
-
+  
   const handleCancel = () => {
     setIsModalVisible(false);
   };
 
-  const handleDelete = (key) => {
+  const handleDelete = (userId) => {
     Modal.confirm({
       title: "Are you sure you want to delete this user?",
       okText: "Yes",
       okType: "danger",
       cancelText: "No",
       onOk: async () => {
-        setFilteredData((prevUsers) => prevUsers.filter((user) => user.key !== key));
+        await deleteUser(userId);
+        setFilteredData((prevUsers) => prevUsers.filter((user) => user._id !== userId));
       },
     });
   };
@@ -80,20 +102,19 @@ const Users = () => {
         .toLowerCase()
         .includes(value.toLowerCase())
     );
-    setFilteredData(searchData);
+    setFilteredData(searchData); 
   };
 
   const columns = [
     {
       title: "First Name",
-      dataIndex: "firstName",
-      key: "firstName",
-      render: (text) => <a>{text}</a>,
+      dataIndex: "first_name",
+      key: "first_name",
     },
     {
       title: "Last Name",
-      dataIndex: "lastName",
-      key: "lastName",
+      dataIndex: "last_name",
+      key: "last_name",
     },
     {
       title: "Email",
@@ -103,12 +124,12 @@ const Users = () => {
     {
       title: "Status",
       key: "status",
-      dataIndex: "status",
-      render: (status) => {
-        let color = status === "Admin" ? "blue" : status === "Moderator" ? "orange" : "green";
+      render: (_, record) => {
+        const role = Object.keys(roleIdMapping).find(key => roleIdMapping[key] === record.role_id);
+        const color = role === "Admin" ? "blue" : role === "Moderator" ? "orange" : "green";
         return (
-          <Tag color={color} key={status}>
-            {status.toUpperCase()}
+          <Tag color={color}>
+            {role ? role.toUpperCase() : 'N/A'} 
           </Tag>
         );
       },
@@ -118,12 +139,8 @@ const Users = () => {
       key: "action",
       render: (_, record) => (
         <Space size="middle">
-          <a style={{ color: "blue" }} onClick={() => showModal(record)}>
-            Edit
-          </a>
-          <a style={{ color: "red" }} onClick={() => handleDelete(record.key)}>
-            Delete
-          </a>
+          <a style={{ color: "blue" }} onClick={() => showModal(record)}>Edit</a>
+          <a style={{ color: "red" }} onClick={() => handleDelete(record._id)}>Delete</a>
         </Space>
       ),
     },
@@ -150,9 +167,7 @@ const Users = () => {
         </div>
         <Anchor
           direction="horizontal"
-          onClick={(e, { href }) => {
-            setActiveSection(href.slice(1));
-          }}
+          onClick={(e, { href }) => setActiveSection(href.slice(1))}
         >
           <Link href="#part-1" title="Users" />
           <Link href="#part-2" title="Roles" />
@@ -168,12 +183,7 @@ const Users = () => {
               <Button type="primary" onClick={() => showModal(null)} className="rounded-sm">Add New</Button>
             </Space>
           </div>
-
-          <Table
-            columns={columns}
-            dataSource={filteredData.length ? filteredData : users}
-            className="rounded-sm border"
-          />
+          <Table columns={columns} dataSource={filteredData} className="rounded-sm border" />
         </div>
       )}
 
@@ -196,14 +206,14 @@ const Users = () => {
           <Form.Item>
             <Input.Group compact>
               <Form.Item
-                name="firstName"
+                name="first_name"
                 noStyle
                 rules={[{ required: true, message: "First name is required" }]}
               >
                 <AntdInput style={{ width: "50%" }} placeholder="First Name" />
               </Form.Item>
               <Form.Item
-                name="lastName"
+                name="last_name"
                 noStyle
                 rules={[{ required: true, message: "Last name is required" }]}
               >
@@ -214,9 +224,12 @@ const Users = () => {
           <Form.Item name="email" rules={[{ required: true, message: "Email is required" }]}>
             <AntdInput placeholder="Email" />
           </Form.Item>
-          <Form.Item name="password" rules={[{ required: true, message: "Password is required" }]}>
+          <Form.Item 
+                name="password" 
+               rules={[{ required: !editingUser, message: "Password is required" }]} 
+            >
             <AntdInput.Password placeholder="Password" />
-          </Form.Item>
+           </Form.Item>
           <Form.Item name="status" label="Select Role" rules={[{ required: true, message: "Please select a role!" }]}>
             <Select placeholder="Select a role" allowClear>
               <Option value="Admin">Admin</Option>

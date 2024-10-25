@@ -1,45 +1,113 @@
 import { create } from 'zustand';
-import axios from 'axios';
 
-const apiUrl = import.meta.env.VITE_DB_URL;
+const useUsersStore = create((set) => ({
+    users: [],
+    fetchUsers: async () => {
+        const token = localStorage.getItem('token');
+        console.log("Token:", token);
 
-const useUserStore = create((set) => ({
-  users: [],
-
-  fetchUsers: async () => {
-    const token = localStorage.getItem("access_token");
-    if (!token) {
-      console.error("No token found. Please log in.");
-      return;
-    }
-
-    // Decode the token to get the role_id
-    let role_id;
-    try {
-      const decodedToken = JSON.parse(atob(token.split(".")[1]));
-      role_id = decodedToken.role_id;
-      console.log("Decoded Role ID:", role_id);
-    } catch (error) {
-      console.error("Failed to decode token:", error);
-      return;
-    }
-
-    if (role_id !== '671420c2df2d71de25efde15') {
-      console.error('Unauthorized: Insufficient permissions to fetch users.');
-      return;
-    }
-
-    try {
-      const response = await axios.get(`${apiUrl}/user`, {
-        headers: {
-          Authorization: `Bearer ${token}`
+        if (!token) {
+            console.warn("No token found.");
+            return;
         }
-      });
-      set({ users: response.data });
-    } catch (error) {
-      console.error('Failed to fetch users:', error);
-    }
-  },
+
+        try {
+            const decodedToken = JSON.parse(atob(token.split('.')[1]));
+            console.log("Decoded Token:", decodedToken);
+
+            const response = await fetch('http://127.0.0.1:5000/user', {
+                method: 'GET',
+                headers: {
+                    'Authorization': `Bearer ${token}`,
+                    'Content-Type': 'application/json',
+                },
+            });
+
+            if (!response.ok) {
+                throw new Error("Failed to fetch users");
+            }
+
+            const data = await response.json();
+            console.log("Fetched Users:", data);
+            
+            set({ users: data });
+        } catch (error) {
+            console.error("Failed to decode token:", error.message);
+            console.error("Fetch error:", error);
+        }
+    },
+    modifyUser: async (userId, userData) => {
+        const token = localStorage.getItem('token');
+        console.log("Token for modifyUser:", token);
+
+        if (!token) {
+            console.warn("No token found for modifyUser.");
+            return;
+        }
+        console.log("User ID for modification:", userId);
+        
+        if (!userId) {
+            console.error("No user ID provided for modification.");
+            return; 
+        }
+
+        try {
+            const response = await fetch(`http://127.0.0.1:5000/user/${userId}`, {
+                method: 'PUT',
+                headers: {
+                    'Authorization': `Bearer ${token}`,
+                    'Content-Type': 'application/json',
+                },
+                body: JSON.stringify(userData),
+            });
+
+            if (!response.ok) {
+                throw new Error("Failed to modify user");
+            }
+
+            const updatedUser = await response.json();
+            console.log("Modified User:", updatedUser);
+
+            set((state) => ({
+                users: state.users.map(user => user.id === userId ? updatedUser : user)
+            }));
+        } catch (error) {
+            console.error("Modify user error:", error);
+        }
+    },
+    deleteUser: async (userId) => {
+      const token = localStorage.getItem('token');
+      console.log("Token for deleteUser:", token);
+
+      if (!token) {
+          console.warn("No token found for deleteUser.");
+          return;
+      }
+
+      console.log("User ID for deletion:", userId);
+
+      try {
+          const response = await fetch(`http://127.0.0.1:5000/user/${userId}`, {
+              method: 'DELETE',
+              headers: {
+                  'Authorization': `Bearer ${token}`,
+                  'Content-Type': 'application/json',
+              },
+          });
+
+          if (!response.ok) {
+              throw new Error("Failed to delete user");
+          }
+
+          console.log(`User with ID ${userId} deleted successfully`);
+
+          set((state) => ({
+              users: state.users.filter(user => user.id !== userId)
+          }));
+      } catch (error) {
+          console.error("Delete user error:", error);
+      }
+  }
 }));
 
-export default useUserStore;
+export default useUsersStore;
