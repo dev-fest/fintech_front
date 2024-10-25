@@ -62,6 +62,13 @@ const NavBar = ({ heroRef, servicesRef, faqRef, footerRef }) => {
                             </div>
                             <div>
                                 <button 
+                                    onClick={() => scrollToSection(offersRef)} 
+                                    className='text-[#A6DBFF] hover:text-[#0073FC]'>
+                                    Offers
+                                </button>
+                            </div>
+                            <div>
+                                <button 
                                     onClick={() => scrollToSection(faqRef)} 
                                     className='text-[#A6DBFF] hover:text-[#0073FC]'>
                                     FAQ

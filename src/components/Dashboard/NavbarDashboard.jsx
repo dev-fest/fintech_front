@@ -1,4 +1,4 @@
-import React, { useState } from "react";
+import React, { useState,useEffect } from "react";
 import Search from "../../../public/assests/search.svg";
 import Notification from "../../../public/assests/notif.svg";
 import Language from "../../../public/assests/language.svg";
@@ -6,6 +6,7 @@ import UserPDF from "../../../public/assests/UserPDF.svg";
 import { Input } from 'antd';
 
 const NavbarDash = () => {
+ 
   // Sample notification data
   const [notifications, setNotifications] = useState([
     {
@@ -81,6 +82,51 @@ const toggleProfil = () => {
   const handleFilterChange = (filter) => {
     setActiveFilter(filter);
   };
+  useEffect(() => {
+    const connectWebSocket = () => {
+        const ws = new WebSocket("wss://fintech-backend-ltm6.onrender.com/");
+
+        ws.onopen = () => {
+            console.log("Connected to WebSocket server");
+        };
+
+        ws.onmessage = (event) => {
+            const newNotification = JSON.parse(event.data);
+            setNotifications((prevNotifications) => [
+                ...prevNotifications,
+                { ...newNotification, read: false }
+            ]);
+        };
+
+        ws.onerror = (event) => {
+            console.error("WebSocket error observed:", event);
+            // Show error message to the user
+            message.error("Error connecting to WebSocket server.");
+            // Optional: Attempt to reconnect
+            setTimeout(() => {
+                console.log("Attempting to reconnect...");
+                connectWebSocket(); // Try to reconnect
+            }, 5000); // Retry after 5 seconds
+        };
+
+        ws.onclose = () => {
+            console.log("Disconnected from WebSocket server");
+            message.warning("WebSocket connection closed. Retrying...");
+            // Attempt to reconnect after a delay
+            setTimeout(() => {
+                console.log("Attempting to reconnect...");
+                connectWebSocket(); // Try to reconnect
+            }, 5000); // Retry after 5 seconds
+        };
+
+        return () => {
+            ws.close();
+        };
+    };
+
+    connectWebSocket(); // Initialize WebSocket connection
+
+}, []);
 
   return (
     <nav
@@ -174,7 +220,7 @@ const toggleProfil = () => {
         />
       </div>
       {/* Upload Button */}
-      <label className="bg-blue-500 text-white h-min px-4 py-2 rounded hover:bg-blue-600 cursor-pointer">
+      <label className="bg-blue-500 text-white h-min px-4 py-2 rounded hover:bg-blue-600 cursor-pointer" onClick={handleImageChange}>
         Upload Profile Picture
       </label>
    
