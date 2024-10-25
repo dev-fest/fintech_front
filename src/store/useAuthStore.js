@@ -1,6 +1,5 @@
 import { create } from 'zustand';
 import axios from 'axios';
-const apiUrl = import.meta.env.VITE_DB_URL;
 
 const useAuthStore = create((set) => ({
     user: null,
@@ -17,7 +16,16 @@ const useAuthStore = create((set) => ({
                 const { user, access_token } = response.data; 
                 set({ user, token: access_token, error: null }); 
                 localStorage.setItem('token', access_token); 
-                console.log(access_token)
+
+                // Decode the JWT token
+                try {
+                    const decodedPayload = JSON.parse(atob(access_token.split('.')[1]));
+                    console.log("Decoded Token Payload:", decodedPayload); // Display decoded info in the console
+                    set({ user: decodedPayload }); // Optionally set the decoded payload as user info in state
+                } catch (decodeError) {
+                    console.error("Failed to decode token:", decodeError);
+                }
+
                 return response.data; 
             } else {
                 throw new Error("Invalid response format");
@@ -35,7 +43,7 @@ const useAuthStore = create((set) => ({
         set({ loading: true, error: null });
         try {
             const createdAt = new Date().toISOString().slice(0, 19).replace('T', ' ');
-            const response = await axios.post(` http://127.0.0.1:5000/user`, {
+            const response = await axios.post(`http://127.0.0.1:5000/user`, {
                 created_at: createdAt,
                 email,
                 first_name,
@@ -60,7 +68,6 @@ const useAuthStore = create((set) => ({
         }
     },
     
-
     logout: () => {
         set({ user: null, token: null });
         localStorage.removeItem('token');

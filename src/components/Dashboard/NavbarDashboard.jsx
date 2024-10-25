@@ -4,6 +4,7 @@ import Notification from "../../../public/assests/notif.svg";
 import Language from "../../../public/assests/language.svg";
 import UserPDF from "../../../public/assests/UserPDF.svg";
 import { Input } from 'antd';
+import useAuthStore from "../../store/useAuthStore";
 
 const NavbarDash = () => {
   // Sample notification data
@@ -40,7 +41,7 @@ const NavbarDash = () => {
   const [fname, setFname] = useState("Issam");
   const [lname, setLname] = useState("oussebata");
   const [role, setRole] = useState("Admin");
-
+  const { user } = useAuthStore(); 
   const [activeFilter, setActiveFilter] = useState("all");
   const [selectedImage, setSelectedImage] = useState(null);
 
@@ -180,16 +181,14 @@ const toggleProfil = () => {
    
             </div>
             <div className="text-sm">First name</div>
-            <Input placeholder="first name" value={fname} className="rounded-sm" />
+            <Input placeholder="first name" value={user?.first_name || ""} className="rounded-sm" />
             <div className="text-sm">Last name</div>
-
-            <Input placeholder="last name" value={lname} className="rounded-sm"/>
-            <div className="text-sm"> Email</div>
-
-            <Input placeholder="email" disabled value={email} className="rounded-sm"/>
+            <Input placeholder="last name" value={user?.last_name || ""} className="rounded-sm"/>
+            <div className="text-sm">Email</div>
+            <Input placeholder="email" disabled value={user?.email || ""} className="rounded-sm"/>
             <div className="text-sm">Role</div>
+            <Input placeholder="role" disabled value={user?.role || ""} className="rounded-sm"/>
 
-            <Input placeholder="role" disabled value={role}  className="rounded-sm"/>
           </div>
         </div>
       )}
