@@ -4,7 +4,7 @@ import NavbarDash from '../components/Dashboard/NavbarDashboard';
 import Dashboard from './Dashboard';
 import Users from './Users';
 import Projects from './Projects';
-
+import ChatBot from '../components/Dashboard/ChatBot';
 const AdminPage = () => {
   const [activeContent, setActiveContent] = useState('dashboard'); // Default active content
 
@@ -31,6 +31,7 @@ const AdminPage = () => {
         {renderActiveContent()}
         </div>
       </div>
+      <ChatBot/>
     </div>
   );
 };
