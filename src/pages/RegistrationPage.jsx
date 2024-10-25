@@ -14,11 +14,8 @@ const RegistrationPage = () => {
   const [confirmPassword, setConfirmPassword] = useState('');
   const [firstName, setFirstName] = useState('');
   const [lastName, setLastName] = useState('');
-  const [companyName, setCompanyName] = useState('');
-  const [field, setField] = useState('');
   const [rememberMe, setRememberMe] = useState(false);
   const [showNext, setShowNext] = useState(false); 
-  const [showFinal, setShowFinal] = useState(false); 
 
   const handleCheckboxChange = (e) => {
     setRememberMe(e.target.checked);
@@ -33,32 +30,38 @@ const RegistrationPage = () => {
   };
 
   const handleCompleteProfile = async () => {
-    if (!firstName || !lastName ) {
+    if (!firstName || !lastName) {
         message.error("All fields are required!");
         return;
     }
-    const roleId = "6713a61ec74280ead1f879b3"; 
+    const roleId = "671420c2df2d71de25efde15"; 
     try {
         await signup(firstName, lastName, email, password, roleId);
+        console.log("success")
         message.success("Registration successful!");
         navigate('/admin');
     } catch (error) {
         message.error("Registration failed: " + (error.response?.data?.message || "An error occurred."));
     }
-};
+  };
+
   const handleLogin = async () => {
     if (!email || !password) {
-      message.error("Email and password are required!");
-      return;
+        message.error("Email and password are required!");
+        return;
     }
     try {
-      await login(email, password);
-      message.success("Login successful!");
-      navigate('/admin');
+        const response = await login(email, password); 
+        // console.log("Login successful!", response.access_token); //to debug
+        message.success("Login successful!");
+        navigate('/admin');
     } catch (error) {
-      message.error("Login failed: " + (error.response?.data?.message || "An error occurred."));
+        // console.error("Login failed:", error); //debugging
+        const errorMessage = error.response?.data?.message || "An error occurred.";
+        message.error("Login failed: " + errorMessage);
     }
-  };
+};
+
 
   return (
     <div className="flex justify-center items-center bg-[#F2F9FA] h-[100vh] w-full font-montserrat">
@@ -139,22 +142,6 @@ const RegistrationPage = () => {
               </Button>
             </div>
           </div>
-        ) : showFinal ? (
-          <div className="flex flex-col items-center">
-            <h2 className="text-xl font-bold mb-4" style={{
-              background: "linear-gradient(180deg, #0073FC 0%, #556AFE 82.3%, #8266FF 100%)",
-              WebkitBackgroundClip: "text",
-              WebkitTextFillColor: "transparent",
-            }}>
-              Let’s Get Started!
-            </h2>
-            <p className="mb-4 text-center">
-              Take control of your company’s financial future with real-time insights and smart expense tracking.
-            </p>
-            <Button type="primary" className="w-full" onClick={() => console.log("Get Started")}>
-              Get Started
-            </Button>
-          </div>
         ) : (
           <div className="flex flex-col items-center">
             <h1 className="text-4xl font-bold mb-4" style={{
@@ -185,17 +172,6 @@ const RegistrationPage = () => {
               value={confirmPassword}
               onChange={(e) => setConfirmPassword(e.target.value)}
             />
-            <div className="flex flex-row justify-between items-center w-full mb-3">
-              <Checkbox 
-                checked={rememberMe}
-                onChange={handleCheckboxChange} 
-              >
-                Remember Me
-              </Checkbox>
-              <Button type="link" className="text-[#0073FC] underline">
-                Forgot your password?
-              </Button>
-            </div>
             <Button type="primary" className="w-full mb-3" onClick={handleNext}>
               Next
             </Button>
@@ -213,4 +189,3 @@ const RegistrationPage = () => {
 };
 
 export default RegistrationPage;
-
