@@ -1,34 +1,24 @@
 import React, { useState, useEffect } from "react";
-import {
-  Input,
-  Space,
-  Table,
-  Tag,
-  Button,
-  Modal,
-  Form,
-  Input as AntdInput,
-  Select,
-  Anchor,
-} from "antd";
-import useAuthStore from "../store/useAuthStore";
-import useUserStore from "../store/useUsersStore"; // Import your custom hook
+import { Input, Space, Table, Tag, Button, Modal, Form, Input as AntdInput, Select, Anchor } from "antd";
+import useUserStore from "../store/useUsersStore";
+import useAuthStore from "../store/useAuthStore"; 
 
 const { Search } = Input;
 const { Option } = Select;
 const { Link } = Anchor;
 
 const Users = () => {
-  const { signup } = useAuthStore();
-  const { fetchUsers, users, deleteUser, updateUser } = useUserStore(); // Destructure the necessary methods and state
   const [isModalVisible, setIsModalVisible] = useState(false);
   const [form] = Form.useForm();
   const [activeSection, setActiveSection] = useState("part-1");
   const [editingUser, setEditingUser] = useState(null);
+  const [filteredData, setFilteredData] = useState([]);
 
-  // Fetch users from the backend
+  const { users, fetchUsers } = useUserStore();
+  const { signup } = useAuthStore(); 
+
   useEffect(() => {
-    fetchUsers(); // Fetch users on mount
+    fetchUsers();
   }, [fetchUsers]);
 
   const showModal = (user) => {
@@ -42,37 +32,29 @@ const Users = () => {
     setIsModalVisible(true);
   };
 
-  const handleOk = () => {
-    form
-      .validateFields()
-      .then(async (values) => {
-        const { firstName, lastName, email, password, status } = values;
+  const handleOk = async () => {
+    try {
+      const values = await form.validateFields();
+      const { firstName, lastName, email, password, status } = values;
+      const roleIdMapping = {
+        Admin: '671420c2df2d71de25efde15',
+        Moderator: '6713a61ec74280ead1f879b3',
+        User: '6713a626c74280ead1f879b4'
+      };
 
-        if (editingUser) {
-          await updateUser({ ...editingUser, ...values }); // Call updateUser from useUserStore
-        } else {
-          let role_id;
-          if (status === "Admin") {
-            role_id = "6713a61ec74280ead1f879b3";
-          } else if (status === "User") {
-            role_id = "6713a61ec74280ead1f879b3";
-          } else if (status === "Mederateur") {
-            role_id = "6713a626c74280ead1f879b4";
-          }
+      const roleId = roleIdMapping[status]; 
 
-          try {
-            await signup(firstName, lastName, email, password, role_id);
-            form.resetFields(); // Reset the form after successful signup
-          } catch (error) {
-            console.error("Error during signup:", error);
-          }
-        }
-        setIsModalVisible(false);
-        fetchUsers(); // Re-fetch users after any action
-      })
-      .catch((info) => {
-        console.log("Validation Failed:", info);
-      });
+      if (editingUser) {
+        // Logic for editing the user (if required)
+      } else {
+        // Call the signup function with the mapped role ID
+        await signup(firstName, lastName, email, password, roleId);
+      }
+
+      setIsModalVisible(false);
+    } catch (info) {
+      console.log("Validation Failed:", info);
+    }
   };
 
   const handleCancel = () => {
@@ -86,8 +68,7 @@ const Users = () => {
       okType: "danger",
       cancelText: "No",
       onOk: async () => {
-        await deleteUser(key); // Call deleteUser from useUserStore
-        fetchUsers(); // Re-fetch users after deletion
+        setFilteredData((prevUsers) => prevUsers.filter((user) => user.key !== key));
       },
     });
   };
@@ -124,7 +105,7 @@ const Users = () => {
       key: "status",
       dataIndex: "status",
       render: (status) => {
-        let color = status === "Admin" ? "blue" : status === "Mederateur" ? "orange" : "green";
+        let color = status === "Admin" ? "blue" : status === "Moderator" ? "orange" : "green";
         return (
           <Tag color={color} key={status}>
             {status.toUpperCase()}
@@ -137,16 +118,10 @@ const Users = () => {
       key: "action",
       render: (_, record) => (
         <Space size="middle">
-          <a
-            style={{ color: "blue" }}
-            onClick={() => showModal(record)}
-          >
+          <a style={{ color: "blue" }} onClick={() => showModal(record)}>
             Edit
           </a>
-          <a
-            style={{ color: "red" }}
-            onClick={() => handleDelete(record.key)}
-          >
+          <a style={{ color: "red" }} onClick={() => handleDelete(record.key)}>
             Delete
           </a>
         </Space>
@@ -155,16 +130,16 @@ const Users = () => {
   ];
 
   return (
-    <div className=" flex flex-col">
+    <div className="flex flex-col">
       <div className="flex flex-col px-5 bg-white mt-1 mx-1 mb-[1px]">
         <div className="flex flex-row items-center font-poppins mt-3 gap-[2px]">
           <div className="text-[#00000073]">Home</div>
-          <img src="../../public/assests/separator.svg" alt="" />
+          <img src="../../public/assets/separator.svg" alt="" />
           <div>Users</div>
         </div>
         <h1 className="text-2xl font-normal mt-2 font-poppins">Users</h1>
 
-        <div className="w-full flex justify-center items-center ">
+        <div className="w-full flex justify-center items-center">
           <Search
             placeholder="Search by name or email"
             allowClear
@@ -176,7 +151,7 @@ const Users = () => {
         <Anchor
           direction="horizontal"
           onClick={(e, { href }) => {
-            handleAnchorChange(href.slice(1));
+            setActiveSection(href.slice(1));
           }}
         >
           <Link href="#part-1" title="Users" />
@@ -188,25 +163,15 @@ const Users = () => {
         <div id="part-1" className="bg-white p-3 mx-6">
           <div className="flex justify-between items-center mb-6">
             <div>User Table</div>
-            <div>
-              <Space>
-                <Button type="default" className="rounded-sm">
-                  View Log
-                </Button>
-                <Button
-                  type="primary"
-                  onClick={() => showModal(null)}
-                  className="rounded-sm"
-                >
-                  Add New{" "}
-                </Button>
-              </Space>
-            </div>
+            <Space>
+              <Button type="default" className="rounded-sm">View Log</Button>
+              <Button type="primary" onClick={() => showModal(null)} className="rounded-sm">Add New</Button>
+            </Space>
           </div>
 
           <Table
             columns={columns}
-            dataSource={users} // Use users from useUserStore
+            dataSource={filteredData.length ? filteredData : users}
             className="rounded-sm border"
           />
         </div>
@@ -246,27 +211,17 @@ const Users = () => {
               </Form.Item>
             </Input.Group>
           </Form.Item>
-          <Form.Item
-            name="email"
-            rules={[{ required: true, message: "Email is required" }]}
-          >
+          <Form.Item name="email" rules={[{ required: true, message: "Email is required" }]}>
             <AntdInput placeholder="Email" />
           </Form.Item>
-          <Form.Item
-            name="password"
-            rules={[{ required: true, message: "Password is required" }]}
-          >
+          <Form.Item name="password" rules={[{ required: true, message: "Password is required" }]}>
             <AntdInput.Password placeholder="Password" />
           </Form.Item>
-          <Form.Item
-            name="status"
-            label="Select Role"
-            rules={[{ required: true, message: "Please select a role!" }]}
-          >
+          <Form.Item name="status" label="Select Role" rules={[{ required: true, message: "Please select a role!" }]}>
             <Select placeholder="Select a role" allowClear>
               <Option value="Admin">Admin</Option>
               <Option value="User">User</Option>
-              <Option value="Mederateur">Mederateur</Option>
+              <Option value="Moderator">Moderator</Option>
             </Select>
           </Form.Item>
         </Form>
