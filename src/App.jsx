@@ -7,7 +7,6 @@ import { BrowserRouter as Router, Routes, Route } from 'react-router-dom';
 import AdminPage from './pages/AdminDashboard'
 import RegistrationPage from './pages/RegistrationPage'
 import PrivateRoute from './components/Landing/PrivateRoute'
-import Users from './pages/Users'
 function App() {
   const [count, setCount] = useState(0);
 
@@ -25,14 +24,7 @@ function App() {
             </PrivateRoute>
           }
         />
-         <Route
-          path="/users"
-          element={
-            <PrivateRoute>
-              <Users />
-            </PrivateRoute>
-          }
-        />
+        
       </Routes>
     </Router>
   );
