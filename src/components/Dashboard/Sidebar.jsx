@@ -41,6 +41,15 @@ const Sidebar = ({ activeContent, setActiveContent }) => {
             <div>Projects</div>
           </div>
         </li>
+        <li 
+          className={`hover:bg-gray-700 ${activeContent === 'metrics' ? 'opacity-100' : 'opacity-60'}`} 
+          onClick={() => setActiveContent('metrics')}
+        >
+          <div className="p-4 block flex flex-row items-center gap-2 cursor-pointer"> {/* Added cursor-pointer here */}
+            <img src={ProjectIcon} alt="projects icon" />
+            <div>Metrics</div>
+          </div>
+        </li>
       </ul>
     </div>
   );
