@@ -4,12 +4,13 @@ import NavBar from '../components/Landing/NavBar';
 import ServicesSection from '../components/Landing/ServicesSection';
 import Faq from '../components/Landing/Faq';
 import Footer from '../components/Landing/Footer';
-
+import Offers from '../components/Landing/Offers';
 export const LandingPage = () => {
   const heroRef = useRef(null);
   const servicesRef = useRef(null);
   const faqRef = useRef(null);
   const footerRef = useRef(null);
+  const offersRef = useRef(null);
 
   return (
     <div className='bg-slate-400 h-[100vh] flex-grow'>
@@ -25,12 +26,16 @@ export const LandingPage = () => {
       <div ref={servicesRef}>
         <ServicesSection />
       </div>
+      <div ref={offersRef}>
+        <Offers/>
+      </div>
       <div ref={faqRef}>
         <Faq />
       </div>
       <div ref={footerRef}>
         <Footer />
       </div>
+      
     </div>
   );
 };
