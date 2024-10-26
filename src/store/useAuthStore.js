@@ -10,7 +10,7 @@ const useAuthStore = create((set) => ({
     login: async (email, password) => {
         set({ loading: true, error: null });
         try {
-            const response = await axios.post(`http://127.0.0.1:5000/login`, { email, password }); 
+            const response = await axios.post(`https://fintech-backend-ltm6.onrender.com/login`, { email, password }); 
 
             if (response.data) {
                 const { user, access_token } = response.data; 
@@ -43,7 +43,7 @@ const useAuthStore = create((set) => ({
         set({ loading: true, error: null });
         try {
             const createdAt = new Date().toISOString().slice(0, 19).replace('T', ' ');
-            const response = await axios.post(`http://127.0.0.1:5000/user`, {
+            const response = await axios.post(`https://fintech-backend-ltm6.onrender.com/user`, {
                 created_at: createdAt,
                 email,
                 first_name,

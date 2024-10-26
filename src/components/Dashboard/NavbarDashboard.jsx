@@ -1,4 +1,4 @@
-import React, { useState,useEffect,useRef } from "react";
+import React, { useState } from "react";
 import Search from "../../../public/assests/search.svg";
 import Notification from "../../../public/assests/notif.svg";
 import Language from "../../../public/assests/language.svg";
@@ -12,7 +12,6 @@ const roleNames = {
 };
 
 const NavbarDash = () => {
-  const fileInputRef = useRef(null);
   const [notifications, setNotifications] = useState([
     { id: 1, title: "New Message", content: "You have received a new message.", date: "2024-10-19", time: "10:30 AM", read: false },
     { id: 2, title: "System Update", content: "A new system update is available.", date: "2024-10-18", time: "09:00 AM", read: true },
@@ -61,51 +60,6 @@ const NavbarDash = () => {
   const handleFilterChange = (filter) => {
     setActiveFilter(filter);
   };
-  useEffect(() => {
-    const connectWebSocket = () => {
-        const ws = new WebSocket("wss://fintech-backend-ltm6.onrender.com/");
-
-        ws.onopen = () => {
-            console.log("Connected to WebSocket server");
-        };
-
-        ws.onmessage = (event) => {
-            const newNotification = JSON.parse(event.data);
-            setNotifications((prevNotifications) => [
-                ...prevNotifications,
-                { ...newNotification, read: false }
-            ]);
-        };
-
-        ws.onerror = (event) => {
-            console.error("WebSocket error observed:", event);
-            //Show error message to the user
-            message.error("Error connecting to WebSocket server.");
-          //  Optional: Attempt to reconnect
-            setTimeout(() => {
-                console.log("Attempting to reconnect...");
-                connectWebSocket(); // Try to reconnect
-            }, 5000); // Retry after 5 seconds
-        };
-
-        ws.onclose = () => {
-            console.log("Disconnected from WebSocket server");
-            message.warning("WebSocket connection closed. Retrying...");
-          //  Attempt to reconnect after a delay
-            setTimeout(() => {
-                console.log("Attempting to reconnect...");
-                connectWebSocket(); // Try to reconnect
-            }, 5000); // Retry after 5 seconds
-        };
-
-        return () => {
-            ws.close();
-        };
-    };
-
-    connectWebSocket(); // Initialize WebSocket connection
-
-}, []);
 
   const roleName = roleNames[user?.role_id] || "Unknown Role";
 
@@ -120,7 +74,6 @@ const NavbarDash = () => {
       <button className="flex items-center cursor-pointer" onClick={toggleDropdown}>
         <img src={Notification} alt="Notification icon" />
       </button>
-      {/* Notification */}
       {showDropdown && (
         <div className="absolute right-6 top-[7vh] w-[40vw] bg-[#F2F9FA] border rounded shadow-lg p-4 z-10">
           <div className="flex flex-col gap-2 px-3">
@@ -151,15 +104,14 @@ const NavbarDash = () => {
                   key={notification.id}
                   className={`p-2 rounded ${notification.read ? "bg-white" : "bg-[#D7F0FF]"}`}
                 >
-                  <div className="flex flex-row justify-between" >
-                    
-                  <div>
-                  <div className="font-medium text-[14px]"  >{notification.title}</div>
-                  <div className="text-[12px] text-gray-500">{notification.content}</div>
-                  </div>
-                  <div className="text-[8px] text-gray-500">
-                    {notification.date} at {notification.time}
-
+                  <div className="flex flex-row justify-between">
+                    <div>
+                      <div className="font-semibold">{notification.title}</div>
+                      <div className="text-[12px]">{notification.content}</div>
+                    </div>
+                    <div className="text-[8px] text-gray-500">
+                      {notification.date} at {notification.time}
+                    </div>
                   </div>
                 </div>
               ))}
@@ -167,7 +119,6 @@ const NavbarDash = () => {
           </div>
         </div>
       )}
-      {/* User Profil */}
       {showProfil && (
         <div className="absolute right-6 top-[7vh] w-[40vw] bg-[#F2F9FA] border rounded shadow-lg p-4 z-10">
           <div className="flex flex-col gap-2 px-3">
@@ -181,32 +132,25 @@ const NavbarDash = () => {
               />
             </div>
             <div className="h-[1px] w-full bg-gray-200"></div>
-           {/* Profil picture row */}
-<div className="flex flex-row items-center gap-5">
-  <div className="relative mb-4">
-    {/* Circular Profile Picture */}
-    <img
-      src={selectedImage || '../../../public/assests/logo.svg'} // Placeholder image if no picture is uploaded
-      alt="Profile"
-      className="h-24 w-24 rounded-full border-4 border-blue-500 object-cover"
-    />
-    <input
-      type="file"
-      accept="image/*"
-      onChange={handleImageChange}
-      ref={fileInputRef}
-      className="absolute inset-0 opacity-0 cursor-pointer" // Invisible file input over the image
-    />
-  </div>
-  {/* Upload Button */}
-  <label
-    className="bg-blue-500 text-white h-min px-4 py-2 rounded hover:bg-blue-600 cursor-pointer"
-    onClick={() => fileInputRef.current.click()} // Trigger file input click
-  >
-    Upload Profile Picture
-  </label>
-</div>
-
+            {/* Profil picture row */}
+            <div className="flex flex-row items-center gap-5">
+              <div className="relative mb-4">
+                <img
+                  src={selectedImage || 'path/to/default-image.jpg'} // Placeholder image if no picture is uploaded
+                  alt="Profile"
+                  className="h-24 w-24 rounded-full border-4 border-blue-500 object-cover"
+                />
+                <input
+                  type="file"
+                  accept="image/*"
+                  onChange={handleImageChange}
+                  className="absolute inset-0 opacity-0 cursor-pointer" // Invisible file input over the image
+                />
+              </div>
+              <label className="bg-blue-500 text-white h-min px-4 py-2 rounded hover:bg-blue-600 cursor-pointer">
+                Upload Profile Picture
+              </label>
+            </div>
             <div className="text-sm">First name</div>
             <Input placeholder="first name" value={user?.first_name || ""} className="rounded-sm" />
             <div className="text-sm">Last name</div>
@@ -219,8 +163,8 @@ const NavbarDash = () => {
         </div>
       )}
       <div className="flex flex-row justify-center items-center gap-1 cursor-pointer" onClick={toggleProfil}>
-        <img src={selectedImage || '../../../public/assests/profile_user.svg'} alt="user photo" className="rounded-full w-[25px] "/>
-        <div>{fname}</div>
+        <img src={UserPDF} alt="user photo" />
+        <div>User</div>
       </div>
       <button className="flex items-center">
         <img src={Language} alt="language icon" />

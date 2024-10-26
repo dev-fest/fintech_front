@@ -15,7 +15,7 @@ const useUsersStore = create((set) => ({
             const decodedToken = JSON.parse(atob(token.split('.')[1]));
             console.log("Decoded Token:", decodedToken);
 
-            const response = await fetch('http://127.0.0.1:5000/user', {
+            const response = await fetch('https://fintech-backend-ltm6.onrender.com/user', {
                 method: 'GET',
                 headers: {
                     'Authorization': `Bearer ${token}`,

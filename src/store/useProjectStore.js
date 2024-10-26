@@ -10,7 +10,7 @@ const useProjectStore = create((set) => ({
     const token = localStorage.getItem('token');
 
     try {
-      const response = await fetch('http://127.0.0.1:5000/project', {
+      const response = await fetch('https://fintech-backend-ltm6.onrender.com/project', {
         method: 'GET',
         headers: {
           'Authorization': `Bearer ${token}`,
