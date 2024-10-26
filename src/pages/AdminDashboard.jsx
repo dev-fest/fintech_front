@@ -4,6 +4,7 @@ import NavbarDash from '../components/Dashboard/NavbarDashboard';
 import Dashboard from './Dashboard';
 import Users from './Users';
 import Projects from './Projects';
+import ChatBot from '../components/Dashboard/ChatBot';
 import Metrics from './Metrics';
 
 const AdminPage = () => {
@@ -34,6 +35,7 @@ const AdminPage = () => {
         {renderActiveContent()}
         </div>
       </div>
+      <ChatBot/>
     </div>
   );
 };
