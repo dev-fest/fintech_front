@@ -168,7 +168,7 @@ const ChatBot = () => {
 
       {isOpen && (
         <div className="fixed bottom-20 right-5 w-[35vw] h-[80vh] bg-white border-black border rounded-lg shadow-lg flex flex-col">
-          <div className="p-3 bg-[#0D009B] h-[10vh] text-white flex justify-between items-center rounded-t-lg">
+          <div className="p-3 bg-[#001529] h-[10vh] text-white flex justify-between items-center rounded-t-lg">
             <span className="font-bold text-[28px] ml-5">B4 ChatBot</span>
           </div>
           <div className="p-4 flex-1 overflow-y-auto">

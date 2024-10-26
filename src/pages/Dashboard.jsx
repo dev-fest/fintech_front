@@ -623,24 +623,7 @@ const Dashboard = () => {
         </div>
       </div>
     ),
-    bool6 && (
-      <div className="flex flex-col justify-between bg-white border-[#0000000F] w-[18vw] h-[182px] p-5 rounded-sm">
-        <div className="flex flex-row justify-between">
-          <div className="text-[#00000073] text-[12px]">Operational Effect</div>
-          <Tooltip title="Operational Effect prompt text">
-            <InfoCircleOutlined className="text-[#000000D9]" />
-          </Tooltip>
-        </div>
-        <div className=" bg-slate-300">
-        <DemoLine />
-        </div>
-        <div className="w-full h-[1px] bg-[#0000000F] my-2"></div>
-        <div className="flex flex-row text-[12px] text-[#000000D9] my-[1px]">
-          <div>Daily Profit</div>
-          <div>${dailyProfit.toLocaleString()}</div>
-        </div>
-      </div>
-    ),
+    
     // Add other components here...
   ];
 
@@ -729,15 +712,6 @@ const Dashboard = () => {
         Operational Effect
       </label>
 
-      <label className={`flex items-center px-4 py-2 cursor-pointer ${bool6 ? 'bg-[#E6F7FF] text-black font-semibold ' : ''}`}>
-        <input
-          type="checkbox"
-          checked={bool6}
-          onChange={() => setBool6((prev) => !prev)}
-          className="hidden"
-        />
-        Boolean 6
-      </label>
 
       <label className={`flex items-center px-4 py-2 cursor-pointer ${bool7 ? 'bg-[#E6F7FF] text-black font-semibold ' : ''}`}>
         <input
@@ -759,25 +733,7 @@ const Dashboard = () => {
         Cashflow
       </label>
 
-      <label className={`flex items-center px-4 py-2 cursor-pointer ${bool9 ? 'bg-[#E6F7FF] text-black font-semibold ' : ''}`}>
-        <input
-          type="checkbox"
-          checked={bool9}
-          onChange={() => setBool9((prev) => !prev)}
-          className="hidden"
-        />
-        Boolean 9
-      </label>
-
-      <label className={`flex items-center px-4 py-2 cursor-pointer ${bool10 ? 'bg-[#E6F7FF] text-black font-semibold ' : ''}`}>
-        <input
-          type="checkbox"
-          checked={bool10}
-          onChange={() => setBool10((prev) => !prev)}
-          className="hidden"
-        />
-        Boolean 10
-      </label>
+      
     </div>
   </div>
 )}
@@ -948,21 +904,21 @@ const Dashboard = () => {
               title="The Income Statement"
               description="The income statement is also called the profit and loss statement, statement of operation, statement of financial result, or income, or earnings statement. "
               imgSrc="../../public/assests/reports.svg" // Adjust the path as needed
-              buttonText="GENERATE AND DOWNLOAD"
+              buttonText="Generate and download"
               onClick={() => handleButtonClick("Income Statement")} // Pass the type of statement
             />
             <FinancialStatementCard
               title="The Balance Sheet"
               description="The balance sheet provides a snapshot of a company’s assets, liabilities, and equity at a specific point in time, reflecting what the company owns and owes."
               imgSrc="../../public/assests/balance_fin.png" // Adjust the path as needed
-              buttonText="GENERATE AND DOWNLOAD"
+              buttonText="Generate and download"
               onClick={() => handleButtonClick("Balance Sheet")} // Pass the type of statement
             />
             <FinancialStatementCard
               title="Cash Flow Statement"
               description="The cash flow statement is a financial report that provides a summary of the cash inflows and outflows for a business during a specific period."
               imgSrc="../../public/assests/balance.png" // Adjust the path as needed
-              buttonText="GENERATE AND DOWNLOAD"
+              buttonText="Generate and download"
               onClick={() => handleButtonClick("Cash Flow Statement")} // Pass the type of statement
             />
           </div>
