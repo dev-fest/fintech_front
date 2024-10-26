@@ -212,7 +212,7 @@ const toggleProfil = () => {
   <div className="relative mb-4">
     {/* Circular Profile Picture */}
     <img
-      src={selectedImage || '../../../public/assests/logo.svg'} // Placeholder image if no picture is uploaded
+      src={selectedImage || '../../../public/assests/profile_user.svg'} // Placeholder image if no picture is uploaded
       alt="Profile"
       className="h-24 w-24 rounded-full border-4 border-blue-500 object-cover"
     />
@@ -245,7 +245,7 @@ const toggleProfil = () => {
         </div>
       )}
       <div className="flex flex-row justify-center items-center gap-1 cursor-pointer" onClick={toggleProfil}>
-        <img src={selectedImage || '../../../public/assests/profile_user.svg'} alt="user photo" className="rounded-full w-[25px] "/>
+        <img src={selectedImage || '../../../public/assests/profile_user.svg'} alt="user photo" className="rounded-full w-[25px] h-[25px] "/>
         <div>{fname}</div>
       </div>
       <button className="flex items-center">
