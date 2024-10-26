@@ -132,6 +132,7 @@ const NavbarDash = () => {
               />
             </div>
             <div className="h-[1px] w-full bg-gray-200"></div>
+
            {/* Profil picture row */}
 <div className="flex flex-row items-center gap-5">
   <div className="relative mb-4">
@@ -157,7 +158,6 @@ const NavbarDash = () => {
     Upload Profile Picture
   </label>
 </div>
-
             <div className="text-sm">First name</div>
             <Input placeholder="first name" value={user?.first_name || ""} className="rounded-sm" />
             <div className="text-sm">Last name</div>
@@ -173,6 +173,7 @@ const NavbarDash = () => {
 
         <img src={selectedImage || '../../../public/assests/profile_user.svg'} alt="user photo" className="rounded-full w-[25px] h-[25px] "/>
         <div>{user?.first_name}</div>
+
 
       </div>
       <button className="flex items-center">
