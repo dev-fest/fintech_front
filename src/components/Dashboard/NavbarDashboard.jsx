@@ -1,4 +1,4 @@
-import React, { useState,useEffect } from "react";
+import React, { useState,useEffect,useRef } from "react";
 import Search from "../../../public/assests/search.svg";
 import Notification from "../../../public/assests/notif.svg";
 import Language from "../../../public/assests/language.svg";
@@ -6,7 +6,8 @@ import UserPDF from "../../../public/assests/UserPDF.svg";
 import { Input } from 'antd';
 
 const NavbarDash = () => {
- 
+  const fileInputRef = useRef(null);
+
   // Sample notification data
   const [notifications, setNotifications] = useState([
     {
@@ -100,9 +101,9 @@ const toggleProfil = () => {
 
         ws.onerror = (event) => {
             console.error("WebSocket error observed:", event);
-            // Show error message to the user
+            //Show error message to the user
             message.error("Error connecting to WebSocket server.");
-            // Optional: Attempt to reconnect
+          //  Optional: Attempt to reconnect
             setTimeout(() => {
                 console.log("Attempting to reconnect...");
                 connectWebSocket(); // Try to reconnect
@@ -112,7 +113,7 @@ const toggleProfil = () => {
         ws.onclose = () => {
             console.log("Disconnected from WebSocket server");
             message.warning("WebSocket connection closed. Retrying...");
-            // Attempt to reconnect after a delay
+          //  Attempt to reconnect after a delay
             setTimeout(() => {
                 console.log("Attempting to reconnect...");
                 connectWebSocket(); // Try to reconnect
@@ -139,6 +140,7 @@ const toggleProfil = () => {
       <button className="flex items-center cursor-pointer" onClick={toggleDropdown}>
         <img src={Notification} alt="Notification icon" />
       </button>
+      {/* Notification */}
       {showDropdown && (
         <div className="absolute right-6 top-[7vh] w-[40vw] bg-[#F2F9FA] border rounded shadow-lg p-4 z-10">
           <div className="flex flex-col gap-2 px-3">
@@ -181,8 +183,8 @@ const toggleProfil = () => {
                   <div className="flex flex-row justify-between" >
                     
                   <div>
-                  <div className="font-semibold "  >{notification.title}</div>
-                  <div className="text-[12px]">{notification.content}</div>
+                  <div className="font-medium text-[14px]"  >{notification.title}</div>
+                  <div className="text-[12px] text-gray-500">{notification.content}</div>
                   </div>
                   <div className="text-[8px] text-gray-500">
                     {notification.date} at {notification.time}
@@ -195,6 +197,7 @@ const toggleProfil = () => {
           </div>
         </div>
       )}
+      {/* User Profil */}
       {showProfil && (
         <div className="absolute right-6 top-[7vh] w-[40vw] bg-[#F2F9FA] border rounded shadow-lg p-4 z-10">
           <div className="flex flex-col gap-2 px-3">
@@ -203,28 +206,31 @@ const toggleProfil = () => {
               <img src="../../../public/assests/x_icon.svg" alt="" className="h-3 cursor-pointer rounded-sm bg-white border border-black" onClick={toggleProfil}  />
             </div>
             <div className="h-[1px] w-full bg-gray-200"></div>
-            {/* Profil picture row */}
-            <div className="flex flex-row items-center gap-5">
-            <div className="relative mb-4">
-        {/* Circular Profile Picture */}
-        <img
-          src={selectedImage || 'path/to/default-image.jpg'} // Placeholder image if no picture is uploaded
-          alt="Profile"
-          className="h-24 w-24 rounded-full border-4 border-blue-500 object-cover"
-        />
-        <input
-          type="file"
-          accept="image/*"
-          onChange={handleImageChange}
-          className="absolute inset-0 opacity-0 cursor-pointer" // Invisible file input over the image
-        />
-      </div>
-      {/* Upload Button */}
-      <label className="bg-blue-500 text-white h-min px-4 py-2 rounded hover:bg-blue-600 cursor-pointer" onClick={handleImageChange}>
-        Upload Profile Picture
-      </label>
-   
-            </div>
+           {/* Profil picture row */}
+<div className="flex flex-row items-center gap-5">
+  <div className="relative mb-4">
+    {/* Circular Profile Picture */}
+    <img
+      src={selectedImage || '../../../public/assests/logo.svg'} // Placeholder image if no picture is uploaded
+      alt="Profile"
+      className="h-24 w-24 rounded-full border-4 border-blue-500 object-cover"
+    />
+    <input
+      type="file"
+      accept="image/*"
+      onChange={handleImageChange}
+      ref={fileInputRef}
+      className="absolute inset-0 opacity-0 cursor-pointer" // Invisible file input over the image
+    />
+  </div>
+  {/* Upload Button */}
+  <label
+    className="bg-blue-500 text-white h-min px-4 py-2 rounded hover:bg-blue-600 cursor-pointer"
+    onClick={() => fileInputRef.current.click()} // Trigger file input click
+  >
+    Upload Profile Picture
+  </label>
+</div>
             <div className="text-sm">First name</div>
             <Input placeholder="first name" value={fname} className="rounded-sm" />
             <div className="text-sm">Last name</div>
@@ -240,8 +246,8 @@ const toggleProfil = () => {
         </div>
       )}
       <div className="flex flex-row justify-center items-center gap-1 cursor-pointer" onClick={toggleProfil}>
-        <img src={UserPDF} alt="user photo" />
-        <div>User</div>
+        <img src={selectedImage || '../../../public/assests/profile_user.svg'} alt="user photo" className="rounded-full w-[25px] "/>
+        <div>{fname}</div>
       </div>
       <button className="flex items-center">
         <img src={Language} alt="language icon" />
