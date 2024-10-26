@@ -1,5 +1,5 @@
 # Capital Core front
-# link https://fintech-front-one.vercel.app/register 
+# link https://fintech-front-one.vercel.app/
 This template provides a minimal setup to get React working in Vite with HMR and some ESLint rules.
 
 Currently, two official plugins are available:
