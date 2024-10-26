@@ -132,25 +132,32 @@ const NavbarDash = () => {
               />
             </div>
             <div className="h-[1px] w-full bg-gray-200"></div>
-            {/* Profil picture row */}
-            <div className="flex flex-row items-center gap-5">
-              <div className="relative mb-4">
-                <img
-                  src={selectedImage || 'path/to/default-image.jpg'} // Placeholder image if no picture is uploaded
-                  alt="Profile"
-                  className="h-24 w-24 rounded-full border-4 border-blue-500 object-cover"
-                />
-                <input
-                  type="file"
-                  accept="image/*"
-                  onChange={handleImageChange}
-                  className="absolute inset-0 opacity-0 cursor-pointer" // Invisible file input over the image
-                />
-              </div>
-              <label className="bg-blue-500 text-white h-min px-4 py-2 rounded hover:bg-blue-600 cursor-pointer">
-                Upload Profile Picture
-              </label>
-            </div>
+
+           {/* Profil picture row */}
+<div className="flex flex-row items-center gap-5">
+  <div className="relative mb-4">
+    {/* Circular Profile Picture */}
+    <img
+      src={selectedImage || '../../../public/assests/profile_user.svg'} // Placeholder image if no picture is uploaded
+      alt="Profile"
+      className="h-24 w-24 rounded-full border-4 border-blue-500 object-cover"
+    />
+    <input
+      type="file"
+      accept="image/*"
+      onChange={handleImageChange}
+      ref={fileInputRef}
+      className="absolute inset-0 opacity-0 cursor-pointer" // Invisible file input over the image
+    />
+  </div>
+  {/* Upload Button */}
+  <label
+    className="bg-blue-500 text-white h-min px-4 py-2 rounded hover:bg-blue-600 cursor-pointer"
+    onClick={() => fileInputRef.current.click()} // Trigger file input click
+  >
+    Upload Profile Picture
+  </label>
+</div>
             <div className="text-sm">First name</div>
             <Input placeholder="first name" value={user?.first_name || ""} className="rounded-sm" />
             <div className="text-sm">Last name</div>
@@ -163,8 +170,11 @@ const NavbarDash = () => {
         </div>
       )}
       <div className="flex flex-row justify-center items-center gap-1 cursor-pointer" onClick={toggleProfil}>
-        <img src={UserPDF} alt="user photo" />
-        <div>User</div>
+
+        <img src={selectedImage || '../../../public/assests/profile_user.svg'} alt="user photo" className="rounded-full w-[25px] h-[25px] "/>
+        <div>{user?.first_name}</div>
+
+
       </div>
       <button className="flex items-center">
         <img src={Language} alt="language icon" />

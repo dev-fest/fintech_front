@@ -5,6 +5,7 @@ import ServicesSection from '../components/Landing/ServicesSection';
 import Faq from '../components/Landing/Faq';
 import Footer from '../components/Landing/Footer';
 import Offers from '../components/Landing/Offers';
+import ChatBot from '../components/Dashboard/ChatBot';
 export const LandingPage = () => {
   const heroRef = useRef(null);
   const servicesRef = useRef(null);
@@ -35,7 +36,7 @@ export const LandingPage = () => {
       <div ref={footerRef}>
         <Footer />
       </div>
-      
+      <ChatBot/>
     </div>
   );
 };

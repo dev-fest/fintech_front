@@ -4,7 +4,7 @@ import DashboardOIcon from '../../../public/assests/dashbooard_icon.svg';
 import ProjectIcon from '../../../public/assests/project.svg';
 import UserIcon from '../../../public/assests/userr.svg';
 import logo from '../../../public/assests/logo.svg';
-
+import MetricsIcon from '../../../public/assests/metric.svg'
 const Sidebar = ({ activeContent, setActiveContent }) => {
   return (
     <div className="w-56 h-full bg-[#001529] text-white fixed flex flex-col font-poppins"
@@ -18,7 +18,7 @@ const Sidebar = ({ activeContent, setActiveContent }) => {
           className={`hover:bg-gray-700 ${activeContent === 'dashboard' ? 'opacity-100' : 'opacity-60'}`} 
           onClick={() => setActiveContent('dashboard')}
         >
-          <div className="p-4 block flex flex-row items-center gap-2 cursor-pointer"> {/* Added cursor-pointer here */}
+          <div className="p-4  flex flex-row items-center gap-2 cursor-pointer"> {/* Added cursor-pointer here */}
             <img src={DashboardOIcon} alt="dashboard icon" />
             <div>Dashboard</div>
           </div>
@@ -45,8 +45,8 @@ const Sidebar = ({ activeContent, setActiveContent }) => {
           className={`hover:bg-gray-700 ${activeContent === 'metrics' ? 'opacity-100' : 'opacity-60'}`} 
           onClick={() => setActiveContent('metrics')}
         >
-          <div className="p-4 block flex flex-row items-center gap-2 cursor-pointer"> {/* Added cursor-pointer here */}
-            <img src={ProjectIcon} alt="projects icon" />
+          <div className="p-4  flex flex-row items-center gap-2 cursor-pointer"> {/* Added cursor-pointer here */}
+            <img src={MetricsIcon} alt="projects icon" />
             <div>Metrics</div>
           </div>
         </li>
