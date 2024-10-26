@@ -1,7 +1,8 @@
 import React, { useState, useEffect } from "react";
 import { Input, Space, Table, Tag, Button, Modal, Form, Input as AntdInput, Select, Anchor } from "antd";
-import useUsersStore from "../store/useUsersStore"; 
-import useAuthStore from "../store/useAuthStore"; 
+import useUsersStore from "../store/useUsersStore";
+import useAuthStore from "../store/useAuthStore";
+import useRoleStore from "../store/useRoleStore";
 
 const { Search } = Input;
 const { Option } = Select;
@@ -15,23 +16,29 @@ const roleIdMapping = {
 
 const Users = () => {
   const [isModalVisible, setIsModalVisible] = useState(false);
+  const [isRoleModalVisible, setIsRoleModalVisible] = useState(false);
   const [form] = Form.useForm();
+  const [roleForm] = Form.useForm();
   const [activeSection, setActiveSection] = useState("part-1");
   const [editingUser, setEditingUser] = useState(null);
+  const [editingRole, setEditingRole] = useState(null);
   const [filteredData, setFilteredData] = useState([]);
+  const [roles, setRoles] = useState(Object.keys(roleIdMapping));
 
-  const { users, fetchUsers, modifyUser, deleteUser } = useUsersStore(); 
-  const { signup } = useAuthStore(); 
+  const { users, fetchUsers, modifyUser, deleteUser } = useUsersStore();
+  const { signup } = useAuthStore();
+  const { fetchAllRoles, createRole, role } = useRoleStore();
 
   useEffect(() => {
     fetchUsers();
-  }, [fetchUsers]);
+    fetchAllRoles();
+  }, [fetchUsers, fetchAllRoles]);
 
   useEffect(() => {
     setFilteredData(users);
   }, [users]);
 
-  const showModal = (user) => {
+  const showUserModal = (user) => {
     if (user) {
       setEditingUser(user);
       form.setFieldsValue(user);
@@ -56,11 +63,7 @@ const Users = () => {
         role_id,
       };
   
-      console.log('Sending Request Data:', requestData); // Log the data you're sending
-  
       if (editingUser && editingUser._id) {
-        // Log the user ID for editing
-        console.log('Editing User ID:', editingUser._id);
         await modifyUser(editingUser._id, requestData);
         setFilteredData((prevUsers) =>
           prevUsers.map((user) => 
@@ -80,9 +83,11 @@ const Users = () => {
   
   const handleCancel = () => {
     setIsModalVisible(false);
+    setIsRoleModalVisible(false);
+    roleForm.resetFields();
   };
 
-  const handleDelete = (userId) => {
+  const handleDeleteUser = (userId) => {
     Modal.confirm({
       title: "Are you sure you want to delete this user?",
       okText: "Yes",
@@ -95,6 +100,10 @@ const Users = () => {
     });
   };
 
+  const handleDeleteRole = (role) => {
+    console.log(`Deleting role: ${role}`);
+  };
+
   const handleSearch = (value) => {
     const searchData = users.filter((user) =>
       Object.values(user)
@@ -102,10 +111,47 @@ const Users = () => {
         .toLowerCase()
         .includes(value.toLowerCase())
     );
-    setFilteredData(searchData); 
+    setFilteredData(searchData);
   };
 
-  const columns = [
+  const handleAddRole = async () => {
+    try {
+      const values = await roleForm.validateFields();
+      const newRoleName = values.role_name;
+
+      setRoles((prevRoles) => [...prevRoles, newRoleName]);
+      await createRole(newRoleName); // Call createRole from useRoleStore
+
+      setIsRoleModalVisible(false);
+      roleForm.resetFields();
+    } catch (error) {
+      console.error("Validation Failed:", error.response?.data || error.message);
+    }
+  };
+
+  const handleEditRole = (role) => {
+    setEditingRole(role);
+    roleForm.setFieldsValue({ role_name: role });
+    setIsRoleModalVisible(true);
+  };
+
+  const handleUpdateRole = async () => {
+    try {
+      const values = await roleForm.validateFields();
+      const updatedRoleName = values.role_name;
+
+      setRoles((prevRoles) =>
+        prevRoles.map((role) => (role === editingRole ? updatedRoleName : role))
+      );
+
+      setIsRoleModalVisible(false);
+      roleForm.resetFields();
+    } catch (error) {
+      console.error("Validation Failed:", error.response?.data || error.message);
+    }
+  };
+
+  const userColumns = [
     {
       title: "First Name",
       dataIndex: "first_name",
@@ -139,12 +185,37 @@ const Users = () => {
       key: "action",
       render: (_, record) => (
         <Space size="middle">
-          <a style={{ color: "blue" }} onClick={() => showModal(record)}>Edit</a>
-          <a style={{ color: "red" }} onClick={() => handleDelete(record._id)}>Delete</a>
+          <a style={{ color: "blue" }} onClick={() => showUserModal(record)}>Edit</a>
+          <a style={{ color: "red" }} onClick={() => handleDeleteUser(record._id)}>Delete</a>
         </Space>
       ),
     },
   ];
+
+  const roleColumns = [
+    {
+      title: "Role Name",
+      dataIndex: "name",
+      key: "name",
+    },
+    {
+      title: "Action",
+      key: "action",
+      render: (_, record) => (
+        <Space size="middle">
+          <Button onClick={() => handleEditRole(record.name)} type="link">Edit</Button>
+          <Button onClick={() => handleDeleteRole(record.name)} type="link" danger>
+            Delete
+          </Button>
+        </Space>
+      ),
+    },
+  ];
+
+  const roleData = roles.map(role => ({
+    key: role,
+    name: role
+  }));
 
   return (
     <div className="flex flex-col">
@@ -180,62 +251,62 @@ const Users = () => {
             <div>User Table</div>
             <Space>
               <Button type="default" className="rounded-sm">View Log</Button>
-              <Button type="primary" onClick={() => showModal(null)} className="rounded-sm">Add New</Button>
+              <Button type="primary" onClick={() => showUserModal(null)} className="rounded-sm">Add New</Button>
             </Space>
           </div>
-          <Table columns={columns} dataSource={filteredData} className="rounded-sm border" />
+          <Table columns={userColumns} dataSource={filteredData} />
         </div>
       )}
-
       {activeSection === "part-2" && (
-        <div id="part-2">
-          <h1 className="text-2xl font-bold">Roles</h1>
-          <p>This is the Roles section where you can manage roles.</p>
+        <div id="part-2" className="bg-white p-3 mx-6">
+          <div className="flex justify-between items-center mb-6">
+            <div>Role Table</div>
+            <Button type="primary" onClick={() => setIsRoleModalVisible(true)} className="rounded-sm">Add New Role</Button>
+          </div>
+          <Table columns={roleColumns} dataSource={roleData} />
         </div>
       )}
 
       <Modal
-        title={editingUser ? "Edit User" : "Add New User"}
+        title={`${editingUser ? "Edit" : "Add New"} User`}
         visible={isModalVisible}
         onOk={handleOk}
         onCancel={handleCancel}
-        okText={editingUser ? "Save" : "Add"}
-        cancelText="Cancel"
       >
         <Form form={form} layout="vertical">
-          <Form.Item>
-            <Input.Group compact>
-              <Form.Item
-                name="first_name"
-                noStyle
-                rules={[{ required: true, message: "First name is required" }]}
-              >
-                <AntdInput style={{ width: "50%" }} placeholder="First Name" />
-              </Form.Item>
-              <Form.Item
-                name="last_name"
-                noStyle
-                rules={[{ required: true, message: "Last name is required" }]}
-              >
-                <AntdInput style={{ width: "50%" }} placeholder="Last Name" />
-              </Form.Item>
-            </Input.Group>
+          <Form.Item name="first_name" label="First Name" rules={[{ required: true }]}>
+            <AntdInput />
           </Form.Item>
-          <Form.Item name="email" rules={[{ required: true, message: "Email is required" }]}>
-            <AntdInput placeholder="Email" />
+          <Form.Item name="last_name" label="Last Name" rules={[{ required: true }]}>
+            <AntdInput />
           </Form.Item>
-          <Form.Item 
-                name="password" 
-               rules={[{ required: !editingUser, message: "Password is required" }]} 
-            >
-            <AntdInput.Password placeholder="Password" />
-           </Form.Item>
-          <Form.Item name="status" label="Select Role" rules={[{ required: true, message: "Please select a role!" }]}>
-            <Select placeholder="Select a role" allowClear>
-              <Option value="Admin">Admin</Option>
-              <Option value="User">User</Option>
-              <Option value="Moderator">Moderator</Option>
+          <Form.Item name="email" label="Email" rules={[{ required: true, type: "email" }]}>
+            <AntdInput />
+          </Form.Item>
+          <Form.Item name="password" label="Password" rules={[{ required: !editingUser }]}>
+            <AntdInput.Password />
+          </Form.Item>
+          <Form.Item name="status" label="Role" rules={[{ required: true }]}>
+            <Select placeholder="Select a role">
+              {roles.map((role) => (
+                <Option key={role} value={role}>
+                  {role}
+                </Option>
+              ))}
             </Select>
+          </Form.Item>
+        </Form>
+      </Modal>
+
+      <Modal
+        title={`${editingRole ? "Edit" : "Add New"} Role`}
+        visible={isRoleModalVisible}
+        onOk={editingRole ? handleUpdateRole : handleAddRole}
+        onCancel={handleCancel}
+      >
+        <Form form={roleForm} layout="vertical">
+          <Form.Item name="role_name" label="Role Name" rules={[{ required: true }]}>
+            <AntdInput />
           </Form.Item>
         </Form>
       </Modal>
