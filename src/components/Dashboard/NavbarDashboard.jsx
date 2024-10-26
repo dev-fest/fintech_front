@@ -172,7 +172,7 @@ const NavbarDash = () => {
       <div className="flex flex-row justify-center items-center gap-1 cursor-pointer" onClick={toggleProfil}>
 
         <img src={selectedImage || '../../../public/assests/profile_user.svg'} alt="user photo" className="rounded-full w-[25px] h-[25px] "/>
-        <div>{fname}</div>
+        <div>{user?.first_name}</div>
 
       </div>
       <button className="flex items-center">
