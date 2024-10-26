@@ -13,8 +13,9 @@ import ReactDOM from "react-dom";
 import { DualAxes } from "@ant-design/plots";
 import { Pie } from "@ant-design/charts";
 import FinancialStatementCard from "../components/Dashboard/FinancialStatementCard";
-
-const { Option } = Select;
+import { Line } from "@ant-design/plots";
+import { BarChart } from "@mui/x-charts/BarChart";
+import { axisClasses } from "@mui/x-charts/ChartsAxis";
 
 const cashFlowData = [
   {
@@ -117,6 +118,86 @@ const cashFlowData = [
     category: "operational",
   },
 ];
+// Step 1: Prepare cash inflow and outflow data for the bar chart
+const inOutCashData = [];
+cashFlowData.forEach((entry) => {
+  inOutCashData.push({
+    time: entry.date,
+    inflow: entry.cash_inflow,
+    outflow: entry.cash_outflow,
+  });
+});
+
+// Step 2: If you want to include net cash flow, merge it with the inflow/outflow data
+const transformedData = cashFlowData.map((entry) => ({
+  time: entry.date,
+  inflow: entry.cash_inflow,
+  outflow: entry.cash_outflow,
+  netCashFlow: entry.net_cash_flow,
+}));
+
+// Step 3: Update your BarChart component to use this transformed dataset
+const chartSetting = {
+  yAxis: [
+    {
+      label: null,
+    },
+  ],
+  width: 500,
+  height: 300,
+  sx: {
+    [`.${axisClasses.left} .${axisClasses.label}`]: {
+      transform: "translate(-20px, 0)",
+    },
+  },
+};
+
+const { Option } = Select;
+
+const DemoLine = () => {
+  const data = [
+    { year: "1991", value: 3 },
+    { year: "1992", value: 4 },
+    { year: "1993", value: 3.5 },
+    { year: "1994", value: 5 },
+    { year: "1995", value: 4.9 },
+    { year: "1996", value: 6 },
+    { year: "1997", value: 7 },
+    { year: "1998", value: 9 },
+    { year: "1999", value: 13 },
+  ];
+  const config = {
+    data,
+    xField: "year",
+    yField: "value",
+    point: {
+      shapeField: "square",
+      sizeField: 4,
+    },
+    interaction: {
+      tooltip: {
+        marker: false,
+      },
+    },
+    style: {
+      lineWidth: 2,
+    },
+    axis: {
+      x: {
+        label: null, // Hides x-axis labels (years)
+      },
+      y: {
+        label: null, // Hides x-axis labels (years)
+      },
+    },
+  };
+  return (
+    <div className="w-full h-[full]">
+      <Line {...config} />
+    </div>
+  );
+};
+
 const DemoDualAxes = () => {
   // Transforming the data
   const inOutCashData = [];
@@ -150,22 +231,18 @@ const DemoDualAxes = () => {
         yField: "value",
         colorField: "type",
         group: true,
-        color: ["#4CAF50", "#F44336"],
         interaction: { elementHighlight: { background: true } },
       },
       {
         data: transformData,
         type: "line",
         yField: "count",
-        style: {
-          lineWidth: 2,
-          stroke: "#F44336", // Corrected color property
-        },
-        axis: { y: { position: "right" } },
+        style: { lineWidth: 2 },
+        axis: { y: { label: null }, x: { label: null } },
         interaction: {
           tooltip: {
             crosshairs: false,
-            marker: false,
+            marker: true,
           },
         },
       },
@@ -310,7 +387,7 @@ const Dashboard = () => {
       },
     };
     return (
-      <div className="w-full h-[80%]">
+      <div className="w-full h-full ">
         <Pie {...config} />
       </div>
     );
@@ -319,10 +396,15 @@ const Dashboard = () => {
     data,
     xField,
     yField: "value",
-    columnWidth: 20,
     title: {
       visible: true,
       text: "Values Over Time",
+    },
+    x: {
+      label: null,
+    },
+    y: {
+      label: null,
     },
     label: {
       visible: true,
@@ -352,12 +434,18 @@ const Dashboard = () => {
 
   // Variables for numerical values
   const netProfit = 126560;
-  const expensesPercentage = 12;
-  const revenuePercentage = 11;
+  const expenses = 1250;
+  const revenue = 795;
   const dailyProfit = 12423;
-  const cashflow = 8846;
-  const visits = 8846;
+  const cashflow = 9000;
+  const incashflow = 21000;
+  const outcashflow = 12000;
+  const budget = 213000;
   const dailyVisits = 1234;
+  const lastprofit = 1200;
+  const profit = 8846;
+
+  const lastcashflow = 10000;
 
   const payments = 6560;
   const conversionRate = 60;
@@ -412,29 +500,35 @@ const Dashboard = () => {
       },
     },
     tooltip: { shared: true, showMarkers: true },
+    x:{
+      label: null
+    },
+    y:{
+      label: null
+    }
   };
   const components = [
     bool1 && (
-      <div className="flex flex-col bg-white border-[#0000000F] w-[18vw] p-5 rounded-sm">
+      <div className="flex flex-col justify-between bg-white border-[#0000000F] w-[18vw] h-[182px] p-5 rounded-sm">
         {/* Net Profit Component */}
         <div className="flex flex-row justify-between">
           <div className="text-[#00000073] text-[12px]">Net profit</div>
-          <Tooltip title="Net profit">
+          <Tooltip title="difference between expences and revenue">
             <InfoCircleOutlined className="text-[#000000D9]" />
           </Tooltip>
         </div>
         <div className="text-[#000000D9] font-medium text-2xl my-[1px]">
           ${netProfit.toLocaleString()}
         </div>
-        <div className="flex flex-row text-[12px] font-roboto text-[#000000D9] my-[1px]">
-          <div>Expenses {expensesPercentage}%</div>
+        <div className="flex flex-row  font-roboto text-[#000000D9] my-[1px] text-[12px] text-gray-500">
+          <div>Expenses {expenses} $</div>
           <CaretUpFilled className="text-green-500" />
         </div>
-        <div className="flex flex-row text-[12px] text-[#000000D9] my-[1px]">
-          <div>Revenue {revenuePercentage}%</div>
+        <div className="flex flex-row text-[12px] text-[#000000D9] my-[1px]  text-gray-500">
+          <div>Revenue {revenue} $</div>
           <CaretDownFilled className="text-red-500" />
         </div>
-        <div className="w-full h-[1px] bg-[#0000000F] my-1"></div>
+        <div className="w-full h-[1px] bg-[#0000000F] my-2"></div>
         <div className="flex flex-row text-[12px] text-[#000000D9] my-[1px]">
           <div>Daily Profit</div>
           <div>${dailyProfit.toLocaleString()}</div>
@@ -442,7 +536,7 @@ const Dashboard = () => {
       </div>
     ),
     bool2 && (
-      <div className="flex flex-col bg-white border-[#0000000F] w-[18vw] p-5 rounded-sm">
+      <div className="flex flex-col justify-between bg-white border-[#0000000F] w-[18vw] h-[182px] p-5 rounded-sm">
         {/* Cashflow Component */}
         <div className="flex flex-row justify-between">
           <div className="text-[#00000073] text-[12px]">Cashflow</div>
@@ -451,37 +545,46 @@ const Dashboard = () => {
           </Tooltip>
         </div>
         <div className="text-[#000000D9] font-medium text-2xl my-[1px]">
-          {cashflow.toLocaleString()}
+          {cashflow.toLocaleString()} $
         </div>
-        <img src="/assests/visits_stats.svg" alt="cashflow stats" />
-        <div className="w-full h-[1px] bg-[#0000000F] my-1"></div>
-        <div className="flex flex-row gap-1 text-[12px] text-[#000000D9] my-[1px]">
-          <div>Daily Visits</div>
-          <div>{dailyVisits.toLocaleString()}</div>
+        <div className="flex flex-col gap-1 text-[12px] text-gray-500">
+          <div className="flex flex-row gap-2">
+            <img src="../../public/assests/in.svg" alt="in_cash" />
+            <div>{incashflow} $</div>
+          </div>
+          <div className="flex flex-row gap-2">
+            <img src="../../public/assests/out.svg" alt="out_cash" />
+            <div>{outcashflow} $</div>
+          </div>
+        </div>
+        <div className="w-full h-[1px] bg-[#0000000F] my-2"></div>
+        <div className="flex flex-row gap-1 text-[12px] text-[#000000D9] ">
+          <div>Last Month</div>
+          <div>{lastcashflow.toLocaleString()} $</div>
         </div>
       </div>
     ),
     bool3 && (
-      <div className="flex flex-col bg-white border-[#0000000F] w-[18vw] p-5 rounded-sm">
+      <div className="flex flex-col justify-between bg-white border-[#0000000F] w-[18vw] h-[182px] p-5 rounded-sm">
         <div className="flex flex-row justify-between">
-          <div className="text-[#00000073] text-[12px]">Visits</div>
-          <Tooltip title="Visits">
+          <div className="text-[#00000073] text-[12px]">Profit</div>
+          <Tooltip title="Profit">
             <InfoCircleOutlined className="text-[#000000D9]" />
           </Tooltip>
         </div>
         <div className="text-[#000000D9] font-medium text-2xl my-[1px]">
-          {visits.toLocaleString()}
+          {profit.toLocaleString()} $
         </div>
         <img src="/assests/visits_stats.svg" alt="Visits stats" />
-        <div className="w-full h-[1px] bg-[#0000000F] my-1"></div>
+        <div className="w-full h-[1px] bg-[#0000000F] my-2"></div>
         <div className="flex flex-row gap-1 text-[12px] text-[#000000D9] my-[1px]">
-          <div>Daily Visits</div>
-          <div>{dailyVisits.toLocaleString()}</div>
+          <div>Last Day</div>
+          <div>{lastprofit.toLocaleString()} $</div>
         </div>
       </div>
     ),
     bool4 && (
-      <div className="flex flex-col bg-white border-[#0000000F] w-[18vw] p-5 rounded-sm">
+      <div className="flex flex-col justify-between bg-white border-[#0000000F] w-[18vw] h-[182px] p-5 rounded-sm">
         <div className="flex flex-row justify-between">
           <div className="text-[#00000073] text-[12px]">Budgets</div>
           <Tooltip title="Budgets">
@@ -489,10 +592,10 @@ const Dashboard = () => {
           </Tooltip>
         </div>
         <div className="text-[#000000D9] font-medium text-2xl my-[1px]">
-          {payments.toLocaleString()}
+          {budget.toLocaleString()} $
         </div>
         <img src="/assests/payemts_stats.svg" alt="Payments stats" />
-        <div className="w-full h-[1px] bg-[#0000000F] my-1"></div>
+        <div className="w-full h-[1px] bg-[#0000000F] my-2"></div>
         <div className="flex flex-row text-[12px] text-[#000000D9] my-[1px]">
           <div>Conversion Rate</div>
           <div>{conversionRate}%</div>
@@ -500,7 +603,7 @@ const Dashboard = () => {
       </div>
     ),
     bool5 && (
-      <div className="flex flex-col bg-white border-[#0000000F] w-[18vw] p-5 rounded-sm">
+      <div className="flex flex-col justify-between bg-white border-[#0000000F] w-[18vw] h-[182px] p-5 rounded-sm">
         <div className="flex flex-row justify-between">
           <div className="text-[#00000073] text-[12px]">Operational Effect</div>
           <Tooltip title="Operational Effect prompt text">
@@ -513,7 +616,25 @@ const Dashboard = () => {
         <Flex vertical gap="small">
           <Progress percent={operationalEffect} showInfo={false} />
         </Flex>
-        <div className="w-full h-[1px] bg-[#0000000F] my-1"></div>
+        <div className="w-full h-[1px] bg-[#0000000F] my-2"></div>
+        <div className="flex flex-row text-[12px] text-[#000000D9] my-[1px]">
+          <div>Daily Profit</div>
+          <div>${dailyProfit.toLocaleString()}</div>
+        </div>
+      </div>
+    ),
+    bool6 && (
+      <div className="flex flex-col justify-between bg-white border-[#0000000F] w-[18vw] h-[182px] p-5 rounded-sm">
+        <div className="flex flex-row justify-between">
+          <div className="text-[#00000073] text-[12px]">Operational Effect</div>
+          <Tooltip title="Operational Effect prompt text">
+            <InfoCircleOutlined className="text-[#000000D9]" />
+          </Tooltip>
+        </div>
+        <div className=" bg-slate-300">
+        <DemoLine />
+        </div>
+        <div className="w-full h-[1px] bg-[#0000000F] my-2"></div>
         <div className="flex flex-row text-[12px] text-[#000000D9] my-[1px]">
           <div>Daily Profit</div>
           <div>${dailyProfit.toLocaleString()}</div>
@@ -555,103 +676,111 @@ const Dashboard = () => {
             >
               Customize
             </button>
-            {/* Metrics Configuration Popup */}
             {metricsConf && (
-              <div className="absolute z-10 mt-7 bg-white p-2 border rounded shadow-lg">
-                <div className="flex flex-col">
-                  <label className="flex items-center">
-                    <input
-                      type="checkbox"
-                      checked={bool1}
-                      onChange={() => setBool1((prev) => !prev)}
-                      className="mr-2"
-                    />
-                    Net Profit{" "}
-                  </label>
-                  <label className="flex items-center">
-                    <input
-                      type="checkbox"
-                      checked={bool2}
-                      onChange={() => setBool2((prev) => !prev)}
-                      className="mr-2"
-                    />
-                    Daily Visits
-                  </label>
-                  <label className="flex items-center">
-                    <input
-                      type="checkbox"
-                      checked={bool3}
-                      onChange={() => setBool3((prev) => !prev)}
-                      className="mr-2"
-                    />
-                    Daily Visits
-                  </label>
-                  <label className="flex items-center">
-                    <input
-                      type="checkbox"
-                      checked={bool4}
-                      onChange={() => setBool4((prev) => !prev)}
-                      className="mr-2"
-                    />
-                    Conversion Rate
-                  </label>
-                  <label className="flex items-center">
-                    <input
-                      type="checkbox"
-                      checked={bool5}
-                      onChange={() => setBool5((prev) => !prev)}
-                      className="mr-2"
-                    />
-                    Operational Effect
-                  </label>
-                  <label className="flex items-center">
-                    <input
-                      type="checkbox"
-                      checked={bool6}
-                      onChange={() => setBool6((prev) => !prev)}
-                      className="mr-2"
-                    />
-                    Boolean 6
-                  </label>
-                  <label className="flex items-center">
-                    <input
-                      type="checkbox"
-                      checked={bool7}
-                      onChange={() => setBool7((prev) => !prev)}
-                      className="mr-2"
-                    />
-                    Expences
-                  </label>
-                  <label className="flex items-center">
-                    <input
-                      type="checkbox"
-                      checked={bool8}
-                      onChange={() => setBool8((prev) => !prev)}
-                      className="mr-2"
-                    />
-                    Cashflow
-                  </label>
-                  <label className="flex items-center">
-                    <input
-                      type="checkbox"
-                      checked={bool9}
-                      onChange={() => setBool9((prev) => !prev)}
-                      className="mr-2"
-                    />
-                    Boolean 9
-                  </label>
-                  <label className="flex items-center">
-                    <input
-                      type="checkbox"
-                      checked={bool10}
-                      onChange={() => setBool10((prev) => !prev)}
-                      className="mr-2"
-                    />
-                    Boolean 10
-                  </label>
-                </div>
-              </div>
-            )}
+  <div className="absolute z-10 mt-7 bg-white  border rounded shadow-lg font-roboto">
+    <div className="flex flex-col">
+      <label className={`flex items-center px-4 py-2 cursor-pointer ${bool1 ? 'bg-[#E6F7FF] text-black  font-semibold ' : ''}`}>
+        <input
+          type="checkbox"
+          checked={bool1}
+          onChange={() => setBool1((prev) => !prev)}
+          className="hidden"
+        />
+        Net Profit
+      </label>
+      
+      <label className={`flex items-center px-4 py-2 cursor-pointer ${bool2 ? 'bg-[#E6F7FF] text-black font-semibold ' : ''}`}>
+        <input
+          type="checkbox"
+          checked={bool2}
+          onChange={() => setBool2((prev) => !prev)}
+          className="hidden"
+        />
+        Daily Visits
+      </label>
+      
+      <label className={`flex items-center px-4 py-2 cursor-pointer ${bool3 ? 'bg-[#E6F7FF] text-black font-semibold ' : ''}`}>
+        <input
+          type="checkbox"
+          checked={bool3}
+          onChange={() => setBool3((prev) => !prev)}
+          className="hidden"
+        />
+        Daily Visits
+      </label>
+
+      <label className={`flex items-center px-4 py-2 cursor-pointer ${bool4 ? 'bg-[#E6F7FF] text-black font-semibold ' : ''}`}>
+        <input
+          type="checkbox"
+          checked={bool4}
+          onChange={() => setBool4((prev) => !prev)}
+          className="hidden"
+        />
+        Conversion Rate
+      </label>
+
+      <label className={`flex items-center px-4 py-2 cursor-pointer ${bool5 ? 'bg-[#E6F7FF] text-black font-semibold ' : ''}`}>
+        <input
+          type="checkbox"
+          checked={bool5}
+          onChange={() => setBool5((prev) => !prev)}
+          className="hidden"
+        />
+        Operational Effect
+      </label>
+
+      <label className={`flex items-center px-4 py-2 cursor-pointer ${bool6 ? 'bg-[#E6F7FF] text-black font-semibold ' : ''}`}>
+        <input
+          type="checkbox"
+          checked={bool6}
+          onChange={() => setBool6((prev) => !prev)}
+          className="hidden"
+        />
+        Boolean 6
+      </label>
+
+      <label className={`flex items-center px-4 py-2 cursor-pointer ${bool7 ? 'bg-[#E6F7FF] text-black font-semibold ' : ''}`}>
+        <input
+          type="checkbox"
+          checked={bool7}
+          onChange={() => setBool7((prev) => !prev)}
+          className="hidden"
+        />
+        Expenses
+      </label>
+
+      <label className={`flex items-center px-4 py-2 cursor-pointer ${bool8 ? 'bg-[#E6F7FF] text-black font-semibold ' : ''}`}>
+        <input
+          type="checkbox"
+          checked={bool8}
+          onChange={() => setBool8((prev) => !prev)}
+          className="hidden"
+        />
+        Cashflow
+      </label>
+
+      <label className={`flex items-center px-4 py-2 cursor-pointer ${bool9 ? 'bg-[#E6F7FF] text-black font-semibold ' : ''}`}>
+        <input
+          type="checkbox"
+          checked={bool9}
+          onChange={() => setBool9((prev) => !prev)}
+          className="hidden"
+        />
+        Boolean 9
+      </label>
+
+      <label className={`flex items-center px-4 py-2 cursor-pointer ${bool10 ? 'bg-[#E6F7FF] text-black font-semibold ' : ''}`}>
+        <input
+          type="checkbox"
+          checked={bool10}
+          onChange={() => setBool10((prev) => !prev)}
+          className="hidden"
+        />
+        Boolean 10
+      </label>
+    </div>
+  </div>
+)}
           </div>
           <div className="flex flex-wrap gap-8">
             {displayedComponents.map((component, index) => (
@@ -668,9 +797,21 @@ const Dashboard = () => {
             <div className="w-full mt-6 py-3 font-roboto text-sm bg-white px-3 ">
               <div>Cash flow</div>
 
-              <div className="flex flex-row h-[500px]">
-                <DemoDualAxes />
-                <Circletypes />
+              <div className="flex flex-row items-center h-min w-full">
+                <BarChart
+                  dataset={transformedData}
+                  xAxis={[{ scaleType: "band", dataKey: "time" }]}
+                  series={[
+                    { dataKey: "inflow", label: "Cash Inflow" },
+                    { dataKey: "outflow", label: "Cash Outflow" },
+                    { dataKey: "netCashFlow", label: "Net Cash Flow" },
+                  ]}
+                  {...chartSetting}
+                />
+                {/* <DemoDualAxes /> */}
+                <div className="flex w-[40%]  max-h-min">
+                  <Circletypes />
+                </div>
               </div>
             </div>
           )}
