@@ -35,6 +35,22 @@ const ChatBot = () => {
     "How do I generate a financial report?",
     "Can you guide me through uploading a file for analysis?"
   ]);
+  const getUserId = () => {
+    // Check if a user ID already exists in localStorage
+    let userId = localStorage.getItem('userId');
+    
+    // If not, generate a new ID and store it
+    if (!userId) {
+      userId = `user-${Math.floor(Math.random() * 1000000)}`;
+      localStorage.setItem('userId', userId);
+    }
+    
+    return userId;
+  };
+  
+  // Then, call this function when initializing the component:
+  const [userId, setUserId] = useState(getUserId());
+  const apiUrl = "https://dev-fest-chatbot.onrender.com/chat";
 
   const toggleChat = () => {
     setIsOpen(!isOpen);
@@ -47,29 +63,68 @@ const ChatBot = () => {
       setSuggestedQuestions([]);
       setIsTyping(true);
       
-      setTimeout(() => {
+      // Send message to the backend
+      fetch("https://dev-fest-chatbot.onrender.com/chat", {
+        method: "POST",
+        headers: {
+          "Content-Type": "application/json"
+        },
+        body: JSON.stringify({
+          message: message,
+          session_id: userId, // Include user ID here
+        })
+      })
+      .then(response => response.json())
+      .then(data => {
+        console.log("Response from server:", data);
         setMessages(prevMessages => [
           ...prevMessages,
-          { text: "This is a bot response to your message!", sender: 'bot' }
+          { text: data.response, sender: 'bot' } // Display bot response
         ]);
         setIsTyping(false);
-      }, 3000);
+      })
+      .catch(error => {
+        console.error("Error:", error);
+        setIsTyping(false);
+      });
     }
   };
+  
 
   const handleSuggestedQuestion = (question) => {
-    setMessages([...messages, { text: question, sender: 'user' }]);
+    const userMessage = { text: question, sender: 'user' };
+    setMessages(prev => [...prev, userMessage]);
     setMessage('');
     setSuggestedQuestions([]);
     setIsTyping(true);
-    
-    setTimeout(() => {
-      setMessages(prevMessages => [
-        ...prevMessages,
-        { text: "This is a bot response to your message!", sender: 'bot' }
+  
+    // Fetch user ID from localStorage (or generate it if not present)
+    const sessionId = getUserId(); // Assumes getUserId() is defined to retrieve or set a unique ID
+  
+    // Send the selected suggested question to the chatbot API
+    fetch("https://dev-fest-chatbot.onrender.com/chat", {
+      method: "POST",
+      headers: {
+        "Content-Type": "application/json"
+      },
+      body: JSON.stringify({
+        message: question,
+        session_id: sessionId, // Use userId for the session ID
+      })
+    })
+    .then(response => response.json())
+    .then(data => {
+      setMessages(prev => [
+        ...prev,
+        { text: data.response, sender: 'bot' }
       ]);
+    })
+    .catch(error => {
+      console.error("Error:", error);
+    })
+    .finally(() => {
       setIsTyping(false);
-    }, 3000);
+    });
   };
 
   const handleKeyDown = (event) => {
@@ -77,13 +132,13 @@ const ChatBot = () => {
       handleSendMessage();
     }
   };
+
   useEffect(() => {
-    // Hide the introductory message after 20 seconds
     const timer = setTimeout(() => {
       setShowIntro(false);
     }, 5000);
 
-    return () => clearTimeout(timer); // Clear the timer if the component unmounts
+    return () => clearTimeout(timer);
   }, []);
 
   return (
