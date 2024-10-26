@@ -4,6 +4,7 @@ import NavbarDash from '../components/Dashboard/NavbarDashboard';
 import Dashboard from './Dashboard';
 import Users from './Users';
 import Projects from './Projects';
+import Metrics from './Metrics';
 
 const AdminPage = () => {
   const [activeContent, setActiveContent] = useState('dashboard'); // Default active content
@@ -17,6 +18,8 @@ const AdminPage = () => {
         return <Users />;
       case 'projects':
         return <Projects />;
+        case 'metrics':
+        return <Metrics />;
       default:
         return <Dashboard />;
     }
