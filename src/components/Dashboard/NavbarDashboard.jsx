@@ -13,10 +13,22 @@ const roleNames = {
 
 const NavbarDash = () => {
   const [notifications, setNotifications] = useState([
-    { id: 1, title: "New Message", content: "You have received a new message.", date: "2024-10-19", time: "10:30 AM", read: false },
-    { id: 2, title: "System Update", content: "A new system update is available.", date: "2024-10-18", time: "09:00 AM", read: true },
-    { id: 3, title: "Event Reminder", content: "Don't forget the meeting at 3 PM.", date: "2024-10-17", time: "02:00 PM", read: false },
-  ]);
+    { id: 1, title: "Optimize Cash Flow", content: "Consider reducing expenses to improve your cash flow balance.", date: "2024-10-26", time: "08:45 AM", read: false },
+    { id: 2, title: "Revenue Increase Opportunity", content: "Recent analysis suggests potential to increase revenue by focusing on high-performing projects.", date: "2024-10-25", time: "11:15 AM", read: false },
+    { id: 3, title: "Budget Adjustment", content: "Consider adjusting your budget allocation to reduce debt.", date: "2024-10-24", time: "03:20 PM", read: true },
+    { id: 4, title: "Project Investment Advice", content: "Invest more in Project Alpha to maximize return on investment.", date: "2024-10-23", time: "10:00 AM", read: false },
+    { id: 5, title: "Expense Analysis", content: "High expenses detected in Q3. Review and optimize your operational costs.", date: "2024-10-22", time: "01:30 PM", read: true },
+    { id: 6, title: "Debt Reduction Suggestion", content: "Consider reducing debt through available cash flow reserves to improve financial health.", date: "2024-10-21", time: "09:45 AM", read: false },
+    { id: 7, title: "Funding Opportunity", content: "Potential funding opportunities available for high-budget projects.", date: "2024-10-20", time: "04:15 PM", read: true },
+    { id: 8, title: "Profit Margin Alert", content: "Profit margin is below target. Consider revising pricing or cutting costs.", date: "2024-10-19", time: "02:00 PM", read: false },
+    { id: 9, title: "Revenue Diversification", content: "Explore opportunities to diversify revenue sources to reduce risk.", date: "2024-10-18", time: "12:30 PM", read: true },
+    { id: 10, title: "Expense Reduction Suggestion", content: "Lowering marketing expenses could increase your profit margin.", date: "2024-10-17", time: "10:45 AM", read: false },
+    { id: 11, title: "Investment Efficiency", content: "Consider reallocating investments from low-return projects to high-potential areas.", date: "2024-10-16", time: "09:30 AM", read: true },
+    { id: 12, title: "Upcoming Financial Goals", content: "Set financial goals for the upcoming quarter to stay on track.", date: "2024-10-15", time: "04:50 PM", read: false },
+    { id: 13, title: "Operational Efficiency Tip", content: "Optimize staffing to reduce payroll expenses and improve operational efficiency.", date: "2024-10-14", time: "11:00 AM", read: true },
+    { id: 14, title: "Financial Report Update", content: "Your quarterly financial report is ready for review in the dashboard.", date: "2024-10-13", time: "08:30 AM", read: false },
+    { id: 15, title: "Profitability Insight", content: "Project Beta is generating high returns. Focus resources here for maximum impact.", date: "2024-10-12", time: "07:45 AM", read: true },
+]);
 
   const [showDropdown, setShowDropdown] = useState(false);
   const [showProfil, setShowProfil] = useState(false);
@@ -146,14 +158,14 @@ const NavbarDash = () => {
       type="file"
       accept="image/*"
       onChange={handleImageChange}
-      ref={fileInputRef}
+      // ref={fileInputRef}
       className="absolute inset-0 opacity-0 cursor-pointer" // Invisible file input over the image
     />
   </div>
   {/* Upload Button */}
   <label
     className="bg-blue-500 text-white h-min px-4 py-2 rounded hover:bg-blue-600 cursor-pointer"
-    onClick={() => fileInputRef.current.click()} // Trigger file input click
+    // onClick={() => fileInputRef.current.click()} // Trigger file input click
   >
     Upload Profile Picture
   </label>
